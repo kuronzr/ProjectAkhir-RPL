@@ -1,0 +1,122 @@
+/* Halaman Premium (header memakai home.css) */
+.btn-premium.current { background: var(--yellow); color: var(--navy); }
+
+.intro { text-align: center; margin: 44px 0 36px; }
+.eyebrow {
+  display: inline-block;
+  font-size: .78rem;
+  font-weight: 600;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: var(--blue);
+  background: #e9ecff;
+  padding: 5px 14px;
+  border-radius: 999px;
+  margin-bottom: 14px;
+}
+.intro h1 { font-size: clamp(1.6rem, 4vw, 2.4rem); font-weight: 700; color: var(--navy); line-height: 1.2; }
+.intro p { margin-top: 10px; color: #555; font-size: 1rem; }
+
+/* Kartu paket */
+.plans {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 28px;
+  max-width: 780px;
+  margin: 0 auto;
+}
+.plan {
+  position: relative;
+  border-radius: 22px;
+  padding: 30px 30px 34px;
+  min-height: 500px;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 10px 30px rgba(5, 0, 58, .12);
+  transition: transform .2s, box-shadow .2s;
+}
+.plan:hover { transform: translateY(-4px); box-shadow: 0 16px 38px rgba(5, 0, 58, .2); }
+
+.plan h2 { font-size: 1.35rem; font-weight: 700; }
+.plan .price { margin: 10px 0 20px; }
+.plan .price strong { font-size: 1.5rem; font-weight: 700; }
+.plan .price span { font-size: 1.05rem; font-weight: 500; opacity: .85; }
+.plan h3 { font-size: 1.15rem; font-weight: 600; margin: 26px 0 14px; }
+
+.btn-sub {
+  display: block;
+  text-align: center;
+  font-size: 1.15rem;
+  font-weight: 600;
+  padding: 14px 0;
+  border-radius: 18px;
+  transition: transform .15s, box-shadow .15s, filter .15s;
+}
+.btn-sub:hover { transform: translateY(-2px); box-shadow: 0 8px 18px rgba(0, 0, 0, .18); }
+.btn-sub:focus-visible { outline: 3px solid var(--yellow); outline-offset: 3px; }
+
+.perks { display: grid; gap: 14px; }
+.perks li {
+  position: relative;
+  padding-left: 30px;
+  font-size: .95rem;
+  font-weight: 500;
+  line-height: 1.4;
+}
+.perks li::before {
+  content: "";
+  position: absolute;
+  left: 0; top: 1px;
+  width: 20px; height: 20px;
+  border-radius: 50%;
+  background: currentColor;
+  opacity: .18;
+}
+.perks li::after {
+  content: "";
+  position: absolute;
+  left: 6px; top: 5px;
+  width: 5px; height: 9px;
+  border: solid currentColor;
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg);
+}
+
+/* Perbulan: biru muda ke abu */
+.plan-month {
+  background: linear-gradient(180deg, #2fa9df 0%, #8ccbe6 50%, #e2e4e4 100%);
+  color: var(--navy);
+  border: 1px solid #c9d3d8;
+}
+.plan-month .btn-sub { background: #fff; color: #1f8fc4; }
+
+/* Pertahun: navy ke biru */
+.plan-year {
+  background: linear-gradient(180deg, #05003a 0%, #0f3a8a 55%, #2196f3 100%);
+  color: #fff;
+}
+.plan-year .btn-sub { background: #b9a6ec; color: #fff; }
+.plan-year .btn-sub:hover { filter: brightness(1.08); }
+
+.badge {
+  position: absolute;
+  top: -13px; right: 24px;
+  background: var(--yellow);
+  color: var(--navy);
+  font-size: .75rem;
+  font-weight: 700;
+  padding: 6px 14px;
+  border-radius: 999px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, .2);
+}
+
+.note { text-align: center; color: #666; font-size: .85rem; margin: 28px 0 60px; }
+
+@media (max-width: 720px) {
+  .plans { grid-template-columns: 1fr; max-width: 440px; gap: 32px; }
+  .plan { min-height: 0; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .plan, .btn-sub { transition: none; }
+  .plan:hover, .btn-sub:hover { transform: none; }
+}

@@ -1,0 +1,102 @@
+/* ===== Reset & dasar ===== */
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --navy: #05003a;
+  --text: #1a1a1a;
+  --label: #444;
+  --border: #222;
+  --card-border: #888;
+}
+
+body {
+  font-family: "Poppins", sans-serif;
+  color: var(--text);
+  background: #fff;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+}
+
+/* ===== Kartu form ===== */
+.card {
+  width: 100%;
+  max-width: 460px;
+  border: 1px solid var(--card-border);
+  border-radius: 10px;
+  padding: 44px 48px 40px;
+  background: #fff;
+}
+
+/* ===== Logo ===== */
+.brand {
+  text-align: center;
+  margin-bottom: 28px;
+}
+.brand img {
+  width: 110px;
+  height: 110px;
+  border-radius: 14px;
+  object-fit: cover;
+  display: block;
+  margin: 0 auto 6px;
+}
+.brand span {
+  font-size: 1.05rem;
+}
+
+/* ===== Form ===== */
+.field { margin-bottom: 18px; }
+
+label {
+  display: block;
+  font-size: 1rem;
+  color: var(--label);
+  margin-bottom: 6px;
+}
+
+input {
+  width: 100%;
+  height: 34px;
+  padding: 0 10px;
+  font: inherit;
+  font-size: .95rem;
+  border: 1px solid var(--border);
+  border-radius: 7px;
+  background: #fff;
+}
+input:focus-visible {
+  outline: 2px solid var(--navy);
+  outline-offset: 1px;
+}
+
+button {
+  width: 100%;
+  height: 34px;
+  margin-top: 8px;
+  font: inherit;
+  font-size: 1rem;
+  color: #fff;
+  background: var(--navy);
+  border: 0;
+  border-radius: 7px;
+  cursor: pointer;
+}
+button:hover { background: #12087a; }
+button:focus-visible { outline: 2px solid var(--navy); outline-offset: 2px; }
+
+/* ===== Tautan bawah ===== */
+.switch {
+  text-align: center;
+  margin-top: 22px;
+}
+.switch a {
+  color: var(--text);
+  text-decoration: underline;
+}
+
+@media (max-width: 480px) {
+  .card { padding: 32px 24px; }
+}

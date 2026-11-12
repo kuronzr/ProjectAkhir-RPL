@@ -1,0 +1,181 @@
+/* ===== Tambahan khusus halaman Home Admin (melengkapi home.css) ===== */
+
+.admin-wrap { margin-top: 6px; }
+
+/* Kotak pengumuman dengan tombol edit di pojok kanan bawah */
+.admin-notice {
+  position: relative;
+  margin-top: 0;
+  min-height: 180px;
+  padding: 14px 22px 40px 8px;
+  border: 1px solid #333;
+  border-radius: 14px;
+  gap: 16px;
+}
+.admin-notice .notice-icon {
+  width: 42px;
+  height: 42px;
+  margin-top: 2px;
+  color: #333;
+}
+.admin-notice .notice-text {
+  font-size: 1rem;
+  line-height: 1.55;
+  color: #000;
+  padding-right: 24px;
+}
+
+.edit-btn {
+  position: absolute;
+  right: 16px;
+  bottom: 10px;
+  width: 30px;
+  height: 30px;
+  background: none;
+  border: 0;
+  color: #000;
+  cursor: pointer;
+  display: grid;
+  place-items: center;
+}
+.edit-btn svg { width: 26px; height: 26px; }
+.edit-btn:hover { color: var(--blue); }
+.edit-btn:focus-visible {
+  outline: 2px solid var(--navy);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* Tombol Buat pengumuman */
+.admin-actions {
+  display: flex;
+  justify-content: center;
+  margin-top: 6px;
+}
+.btn-create {
+  font-family: inherit;
+  font-size: .98rem;
+  color: #fff;
+  background: linear-gradient(90deg, #05003a 0%, #3b3fd6 100%);
+  border: 1px solid #05003a;
+  border-radius: 6px;
+  padding: 4px 10px;
+  cursor: pointer;
+}
+.btn-create:hover { filter: brightness(1.15); }
+.btn-create:focus-visible {
+  outline: 2px solid var(--sky);
+  outline-offset: 2px;
+}
+
+.admin-notice .notice-text { white-space: pre-line; }
+
+/* ===== Modal edit (floating) ===== */
+.sr-only {
+  position: absolute;
+  width: 1px; height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+body.modal-open { overflow: hidden; }
+
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  background: rgba(5, 0, 58, .45);
+  display: grid;
+  place-items: center;
+  padding: 16px;
+}
+.modal-overlay[hidden] { display: none; }
+
+.modal {
+  width: min(100%, 560px);
+  background: #fff;
+  border-radius: 14px;
+  box-shadow: 0 16px 48px rgba(5, 0, 58, .35);
+  padding: 20px 22px 18px;
+  animation: pop .18s ease-out;
+}
+@keyframes pop {
+  from { opacity: 0; transform: translateY(8px) scale(.98); }
+  to   { opacity: 1; transform: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .modal { animation: none; }
+}
+
+.modal-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+.modal-head h2 {
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: var(--navy);
+}
+.modal-close {
+  background: none;
+  border: 0;
+  width: 30px; height: 30px;
+  display: grid; place-items: center;
+  border-radius: 6px;
+  color: #333;
+  cursor: pointer;
+}
+.modal-close svg { width: 18px; height: 18px; }
+.modal-close:hover { background: #e9ecff; }
+
+.modal textarea {
+  width: 100%;
+  font: inherit;
+  font-size: .95rem;
+  line-height: 1.55;
+  color: #000;
+  border: 1px solid #333;
+  border-radius: 10px;
+  padding: 10px 12px;
+  resize: vertical;
+  min-height: 140px;
+}
+.modal textarea:focus-visible {
+  outline: 2px solid var(--sky);
+  outline-offset: 1px;
+}
+
+.modal-foot {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 14px;
+}
+.modal-foot .btn-create { padding: 6px 18px; }
+.btn-ghost {
+  font-family: inherit;
+  font-size: .98rem;
+  color: var(--navy);
+  background: #fff;
+  border: 1px solid #333;
+  border-radius: 6px;
+  padding: 6px 18px;
+  cursor: pointer;
+}
+.btn-ghost:hover { background: #e9ecff; }
+
+.role {
+  background: var(--sky); /* Menghasilkan background warna biru cerah */
+  color: #fff;
+  font-size: .72rem;
+  font-weight: 600;
+  padding: 6px 16px;
+  border-radius: 999px;
+}
+
+@media (max-width: 640px) {
+  .admin-notice { flex-direction: column; padding: 14px 16px 44px; }
+  .admin-notice .notice-text { padding-right: 0; }
+}

@@ -1,0 +1,17 @@
+/* Tambahan untuk halaman Anggota Subscription.
+   Dasar tampilan memakai pengajuan-subscription.css, jadi file itu harus dimuat lebih dulu. */
+
+.tbl-anggota { min-width: 520px; }
+
+/* Badge jenis subscription */
+.badge.bulanan { background: #e0f0fb; color: #146a96; }
+.badge.tahunan { background: #fff3c4; color: #8a6500; }
+
+/* Baris anggota yang diblokir */
+tr.diblokir td:not(:last-child) { color: var(--muted); }
+
+/* Tombol Ban (merah solid) dan Buka Blokir (outline hijau) */
+.btn-ban { background: var(--red); color: #fff; }
+.btn-ban:hover { background: #bd2f2f; }
+.btn-buka { background: #fff; color: var(--green); border-color: var(--green); }
+.btn-buka:hover { background: #dcf6e8; }

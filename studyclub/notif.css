@@ -1,0 +1,77 @@
+/* Lonceng notifikasi (dipakai di semua halaman yang punya header) */
+.notif-wrap { position: relative; display: inline-flex; }
+.notif-wrap .icon-btn { position: relative; padding: 4px; }
+.notif-badge {
+  position: absolute;
+  top: -2px; right: -4px;
+  min-width: 16px; height: 16px;
+  padding: 0 4px;
+  border-radius: 999px;
+  background: #e5334b;
+  color: #fff;
+  font-size: .62rem;
+  font-weight: 700;
+  line-height: 16px;
+  text-align: center;
+  pointer-events: none;
+}
+.notif-badge[hidden] { display: none; }
+
+.notif-panel {
+  position: absolute;
+  top: calc(100% + 12px);
+  right: -60px;
+  width: 340px;
+  max-height: 440px;
+  display: flex;
+  flex-direction: column;
+  background: #fff;
+  color: #1a1a1a;
+  border-radius: 12px;
+  box-shadow: 0 12px 32px rgba(5, 0, 58, .3);
+  overflow: hidden;
+  z-index: 60;
+}
+.notif-panel[hidden] { display: none; }
+.notif-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 12px 14px;
+  border-bottom: 1px solid #e6e8f0;
+}
+.notif-head h2 { font-size: .95rem; font-weight: 700; color: var(--navy); }
+.notif-readall {
+  font: inherit;
+  font-size: .75rem;
+  color: var(--blue);
+  background: none;
+  border: 0;
+  cursor: pointer;
+  text-decoration: underline;
+}
+.notif-readall:disabled { color: #999; cursor: default; text-decoration: none; }
+.notif-readall:focus-visible, .notif-item:focus-visible { outline: 2px solid var(--navy); outline-offset: -2px; }
+
+.notif-list { overflow-y: auto; list-style: none; }
+.notif-item {
+  display: flex;
+  gap: 10px;
+  padding: 12px 14px;
+  border-bottom: 1px solid #f0f1f6;
+  color: #1a1a1a;
+}
+.notif-item:last-child { border-bottom: 0; }
+.notif-item:hover { background: #f4f5fb; }
+.notif-item.unread { background: #eef0ff; }
+.notif-item.unread:hover { background: #e4e7ff; }
+.notif-dot { width: 8px; height: 8px; margin-top: 6px; border-radius: 50%; background: transparent; flex: none; }
+.notif-item.unread .notif-dot { background: var(--blue); }
+.notif-title { font-size: .85rem; font-weight: 600; line-height: 1.35; }
+.notif-text { font-size: .78rem; color: #555; line-height: 1.4; margin-top: 2px; }
+.notif-empty { padding: 28px 14px; text-align: center; color: #777; font-size: .85rem; }
+
+@media (max-width: 640px) {
+  .notif-panel { position: fixed; left: 12px; right: 12px; width: auto; top: 64px; }
+}

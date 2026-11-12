@@ -1,0 +1,79 @@
+/* Halaman admin: tombol tambah, ikon edit, tab Edit, dan form (memakai kursus.css + materi.css) */
+[hidden] { display: none !important; }
+
+/* Daftar kursus */
+.k-tabs { align-items: center; }
+.a-plus {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 34px; height: 34px; border-radius: 50%;
+  border: 1.5px solid #111; color: #111; background: #fff;
+}
+.a-plus:hover { background: #f0f2f7; }
+.a-plus svg { width: 18px; height: 18px; }
+.a-box { flex: 1; min-width: 0; color: inherit; }
+a.a-box:hover .k-name { text-decoration: underline; }
+.a-pencil { margin-left: auto; display: inline-flex; padding: 4px; color: #111; border-radius: 4px; }
+.a-pencil:hover { background: #e1e5ef; }
+.a-pencil svg { width: 22px; height: 22px; }
+
+/* Tab Edit di halaman materi */
+.m-tab.edit { color: #d3202a; border-color: #111; display: inline-block; }
+.m-tab.edit:hover { background: #fdecee; }
+
+/* Form */
+.a-card { margin-top: 16px; padding: 24px; background: #fff; border: 1px solid #777; border-radius: 6px; }
+.a-judul { margin: 0 0 4px; font-size: 1rem; font-weight: 700; color: var(--navy); }
+.a-label { display: block; margin: 16px 0 6px; font-size: .9rem; color: #222; }
+.a-input {
+  display: block; width: 100%; max-width: 640px; padding: 8px 12px;
+  font: inherit; font-size: .85rem; color: #111;
+  background: #fff; border: 1px solid #333; border-radius: 6px;
+}
+textarea.a-input { resize: vertical; min-height: 40px; }
+.a-input:focus-visible { outline: 2px solid var(--navy); outline-offset: 1px; }
+
+.a-drop {
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px;
+  width: 100%; max-width: 640px; min-height: 170px; padding: 20px;
+  font: inherit; color: #111; background: #fff;
+  border: 1px dashed var(--navy); border-radius: 8px; cursor: pointer; text-align: center;
+}
+.a-drop:hover, .a-drop.over { background: #f6f7fb; }
+.a-drop:focus-visible { outline: 2px solid var(--navy); outline-offset: 2px; }
+.a-drop svg { width: 18px; height: 18px; color: #444; }
+.a-drop-title { font-size: .9rem; font-weight: 700; word-break: break-all; }
+.a-drop-info { font-size: .65rem; color: #555; }
+
+.a-row { display: flex; flex-wrap: wrap; align-items: stretch; gap: 10px; }
+.a-chips { display: contents; }
+.a-chip {
+  display: flex; align-items: center; justify-content: space-between; gap: 14px;
+  min-width: 140px; max-width: 220px; padding: 10px 14px;
+  border: 1px solid #111; border-radius: 14px; font-size: .85rem; color: #111;
+}
+.a-chip u { display: block; margin-bottom: 8px; word-break: break-all; }
+.a-x { flex: none; border: 0; background: none; color: #e02020; cursor: pointer; padding: 2px; line-height: 0; }
+.a-x svg { width: 16px; height: 16px; }
+.a-addbox {
+  min-width: 56px; font: inherit; font-size: 1.1rem; color: #111;
+  background: #fff; border: 1px solid #111; border-radius: 14px; cursor: pointer;
+}
+.a-addbox:hover { background: #f0f2f7; }
+
+.a-actions { display: flex; justify-content: space-between; gap: 12px; margin-top: 18px; }
+.a-btn { font: inherit; font-size: .85rem; color: #fff; padding: 9px 22px; border: 0; border-radius: 6px; cursor: pointer; }
+.a-btn:hover { filter: brightness(1.15); }
+.a-simpan { background: linear-gradient(90deg, #0b0a3a, #2b3fd1); }
+.a-hapus { background: linear-gradient(90deg, #a01218, #5a0a0e); }
+.a-btn:focus-visible { outline: 2px solid var(--navy); outline-offset: 2px; }
+.a-card .p-status { text-align: left; margin-top: 14px; }
+
+/* Course (admin) */
+.c-admin-badge {
+  display: inline-block; vertical-align: middle; margin-left: 8px; padding: 3px 10px;
+  font-size: .7rem; font-weight: 600; color: #fff; background: var(--navy); border-radius: 999px;
+}
+.c-count { margin-top: auto; margin-bottom: 14px; font-size: .8rem; color: #555; }
+.courses.list .c-count { margin: 0; width: 200px; }
+.c-btn.solid { color: #fff; background: var(--navy); border-color: var(--navy); }
+.c-btn.solid:hover { filter: brightness(1.2); background: var(--navy); }
