@@ -1,0 +1,209 @@
+<?php
+session_start();
+
+// Cek apakah user sudah login (opsional, sesuaikan dengan alur auth kamu)
+if (!isset($_SESSION['role'])) {
+    header("Location: login.php");
+    exit;
+}
+
+$role = strtolower($_SESSION['role']);
+// $role = 'adm'; // Contoh role, ganti dengan session yang sesuai
+$isAdmin = ($role === 'admin');
+?>
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title><?= $isAdmin ? 'Beranda Admin - Study Club' : 'Beranda - Study Club' ?></title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../public/CSS/style.css">
+</head>
+
+<body>
+
+  <!-- ===== HEADER ===== -->
+  <header class="header">
+    <div class="bar">
+      <a href="home.php" class="logo"><img src="../public/img/logo.png" alt="Study Club"></a>
+
+      <nav aria-label="Menu utama">
+        <ul class="nav">
+          <?php if ($isAdmin): ?>
+            <!-- Header Admin -->
+            <li><a href="home.php" class="current" aria-current="page">Home</a></li>
+            <li><a href="../view/course-admin.html">Course</a></li>
+            <li><a href="../view/schedule-admin.html">Schedule</a></li>
+            <li><a href="../view/pengajuan-subscription.html">Pengajuan</a></li>
+            <li><a href="../view/anggota-subscription.html">Subscription</a></li>
+          <?php else: ?>
+            <!-- Header User Biasa -->
+            <li><a href="home.php" class="current" aria-current="page">Home</a></li>
+            <li><a href="../view/course.html">Course</a></li>
+            <li><a href="../view/schedule.html">Schedule</a></li>
+          <?php endif; ?>
+        </ul>
+      </nav>
+
+      <div class="actions">
+        <?php if ($isAdmin): ?>
+          <!-- Actions Khusus Admin -->
+          <span class="role">Admin</span>
+          <a href="../view/profil.html" class="avatar" aria-label="Profil admin"></a>
+        <?php else: ?>
+          <!-- Actions User Biasa -->
+          <a href="../view/premium.html" class="btn-premium">Premium</a>
+          <button class="icon-btn" aria-label="Notifikasi">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg>
+          </button>
+          <a href="../view/profil.html" class="avatar" aria-label="Profil"></a>
+        <?php endif; ?>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <?php if ($isAdmin): ?>
+      <!-- ===================================== -->
+      <!-- TAMPILAN KONTEN UTAMA KHUSUS ADMIN    -->
+      <!-- ===================================== -->
+      <div class="container admin-wrap">
+        <!-- ===== PENGUMUMAN (ADMIN) ===== -->
+        <section class="notice admin-notice" aria-label="Pengumuman">
+          <svg class="notice-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"
+            stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 11v2a1 1 0 0 0 1 1h3l8 5V5L7 10H4a1 1 0 0 0-1 1z" />
+            <path d="M18.5 9a4 4 0 0 1 0 6" />
+            <path d="M7 14l1.2 5.2a1 1 0 0 0 1 .8h1.3a1 1 0 0 0 1-1.2L10.7 16" />
+          </svg>
+
+          <p class="notice-text">lorem ipsum dolor sit amet consectetur adipiscing elit sint officia eu aute qui ad esse
+            eu esse minus exercitation nulla et quod iusto officia tempor duis dignissimos id velit est nam optio non
+            cupiditate dolor exercitation corrupti ut excepteur cupidatat aliqua consequat dolorum praesentium culpa
+            similique est occaecat ut est deserunt cillum cumque elit officia animi nihil nulla dolor expedita</p>
+
+          <button type="button" class="edit-btn" aria-label="Edit pengumuman">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"
+              stroke-linejoin="round">
+              <path d="M17 3l4 4L8 20l-5 1 1-5z" />
+              <path d="M14.5 5.5l4 4" />
+              <path d="M5 16l3 3" />
+            </svg>
+          </button>
+        </section>
+
+        <div class="admin-actions">
+          <button type="button" class="btn-create">Buat pengumuman</button>
+        </div>
+      </div>
+
+    <?php else: ?>
+      <!-- ===================================== -->
+      <!-- TAMPILAN KONTEN UTAMA KHUSUS MEMBER   -->
+      <!-- ===================================== -->
+      <!-- ===== BANNER / CAROUSEL ===== -->
+      <section class="container carousel" aria-label="Banner promosi">
+        <button class="arrow prev" aria-label="Sebelumnya">
+          <svg viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
+        </button>
+
+        <div class="slides">
+          <div class="slide active">
+            <div class="panel"><small>PROMO PREMIUM</small><strong>67%</strong><span>DISKON PAKET BELAJAR</span></div>
+            <div class="art"><img src="../public/img/logo.png" alt=""></div>
+          </div>
+          <div class="slide alt">
+            <div class="panel"><small>KELAS BARU</small><strong>PBO</strong><span>JAVA + MYSQL</span></div>
+            <div class="art"><img src="../public/img/logo.png" alt=""></div>
+          </div>
+        </div>
+
+        <div class="dots"></div>
+
+        <button class="arrow next" aria-label="Berikutnya">
+          <svg viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>
+        </button>
+      </section>
+
+      <!-- ===== TEKS BERJALAN ===== -->
+      <div class="ticker" aria-hidden="true">
+        <span class="track">Pendaftaran anggota baru batch semester ini resmi dibuka. Pelajari Web Development, UI/UX, hingga Data Science langsung dari praktik dan proyek kolaboratif—terbuka untuk seluruh mahasiswa Informatika dari tingkat pemula hingga mahir.</span>
+      </div>
+
+      <div class="container">
+        <!-- ===== PENGUMUMAN ===== -->
+        <section class="notice" aria-label="Pengumuman">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11v2a1 1 0 0 0 1 1h3l8 5V5L7 10H4a1 1 0 0 0-1 1z"/><path d="M18.5 9a4 4 0 0 1 0 6"/><path d="M7 14l1.2 5.2a1 1 0 0 0 1 .8h1.3a1 1 0 0 0 1-1.2L10.7 16"/></svg>
+          <p>Halo, Mahasiswa Informatika! Merasa materi perkuliahan saja belum cukup untuk menghadapi dunia industri IT? Atau punya banyak ide aplikasi keren tapi bingung harus mulai mengeksekusinya dari mana dan bersama siapa?
+
+Study Club Informatika kembali membuka pintu bagi kamu yang ingin bertumbuh, berkolaborasi, dan mengeksplorasi teknologi lebih dalam. Di sini, kamu tidak hanya belajar secara teori, tetapi juga akan langsung terlibat dalam hands-on workshop, bedah studi kasus, persiapan kompetisi IT (Gemastik, Hackathon, Competitive Programming), hingga membangun proyek kolaboratif yang siap mempercantik portofoliomu.</p>
+        </section>
+
+        <!-- ===== TESTIMONI (2 x 2) ===== -->
+        <section class="testi" aria-label="Testimoni">
+          <article class="testi-card">
+            <div class="testi-ava" aria-hidden="true">K</div>
+            <p class="testi-text">Materi dan praktikumnya tersusun rapi, jadi belajar bareng di Study Club terasa jauh lebih terarah.</p>
+            <h3 class="testi-name">Jerome Polin</h3>
+          </article>
+
+          <article class="testi-card">
+            <div class="testi-ava" aria-hidden="true">Z</div>
+            <p class="testi-text">Sesi tanya jawab dengan mentor sangat membantu waktu saya buntu mengerjakan tugas praktikum.</p>
+            <h3 class="testi-name">Kanye West</h3>
+          </article>
+
+          <article class="testi-card">
+            <div class="testi-ava" aria-hidden="true">F</div>
+            <p class="testi-text">Jadwal kegiatan yang jelas bikin saya tidak pernah ketinggalan pertemuan dan materi baru.</p>
+            <h3 class="testi-name">Windah Basudara</h3>
+          </article>
+
+          <article class="testi-card">
+            <div class="testi-ava" aria-hidden="true">J</div>
+            <p class="testi-text">Latihan soal dan pembahasannya membantu saya lebih siap menghadapi ujian di kelas.</p>
+            <h3 class="testi-name">Joker</h3>
+          </article>
+        </section>
+      </div>
+    <?php endif; ?>
+  </main>
+
+  <?php if ($isAdmin): ?>
+    <!-- ===== MODAL EDIT PENGUMUMAN (HANYA DIRENDER UNTUK ADMIN) ===== -->
+    <div class="modal-overlay" id="editModal" hidden>
+      <div class="modal" role="dialog" aria-modal="true" aria-labelledby="editTitle">
+        <div class="modal-head">
+          <h2 id="editTitle">Edit pengumuman</h2>
+          <button type="button" class="modal-close" data-close aria-label="Tutup">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+              <path d="M6 6l12 12M18 6L6 18" />
+            </svg>
+          </button>
+        </div>
+
+        <form id="editForm">
+          <label for="editText" class="sr-only">Isi pengumuman</label>
+          <textarea id="editText" rows="8" required placeholder="Tulis pengumuman di sini..."></textarea>
+
+          <div class="modal-foot">
+            <button type="button" class="btn-ghost" data-close>Batal</button>
+            <button type="submit" class="btn-create">Simpan</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <script src="../public/js/home-admin.js"></script>
+  <?php else: ?>
+    <script src="../public/js/home.js"></script>
+  <?php endif; ?>
+
+  <script src="../public/js/notif.js"></script>
+</body>
+
+</html>
