@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Profil - Study Club</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../public/CSS/style.css">
+</head>
+<body>
+
+  <!-- ===== HEADER ===== -->
+  <header class="header">
+    <div class="bar">
+      <a href="../view/home.php" class="logo"><img src="../public/img/logo.png" alt="Study Club"></a>
+
+      <nav aria-label="Menu utama">
+        <ul class="nav">
+          <li><a href="../view/home.php">Home</a></li>
+          <li><a href="../view/course.php">Course</a></li>
+          <li><a href="../view/schedule-anggota.php">Schedule</a></li>
+        </ul>
+      </nav>
+
+      <div class="actions">
+        <a href="../public/view/premium.html" class="btn-premium">Premium</a>
+        <button class="icon-btn" aria-label="Notifikasi">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg>
+        </button>
+        <a href="../public/view/profil.html" class="avatar" aria-label="Profil" aria-current="page"></a>
+      </div>
+    </div>
+  </header>
+
+  <main class="container p-layout">
+    <!-- ===== KIRI: PROFIL ===== -->
+    <section class="p-side" aria-label="Profil pengguna">
+      <div class="p-photo" id="foto" role="img" aria-label="Foto profil"></div>
+
+      <div id="tampil">
+        <h1 class="p-name" id="nama">Kuro</h1>
+        <p class="p-bio" id="bio">Mahasiswa Informatika, Universitas Singaperbangsa Karawang.</p>
+        <button type="button" class="p-edit" id="btn-edit">Edit profile</button>
+      </div>
+
+      <form id="form-edit" class="p-form" hidden novalidate>
+        <label for="in-nama">Nama</label>
+        <input type="text" id="in-nama" maxlength="40">
+        <label for="in-bio">Bio</label>
+        <textarea id="in-bio" rows="3" maxlength="120"></textarea>
+
+        <label for="in-foto">Foto profil</label>
+        <input type="file" id="in-foto" accept="image/*">
+        <button type="button" class="p-edit p-small" id="btn-hapus-foto">Hapus foto</button>
+
+        <fieldset class="p-fieldset">
+          <legend>Mata pelajaran yang diambil</legend>
+          <div id="pilih-mapel"></div>
+        </fieldset>
+
+        <button type="button" class="p-edit p-logout" id="btn-logout">Logout</button>
+
+        <p class="p-err" id="err" role="alert"></p>
+        <div class="p-row">
+          <button type="submit" class="p-edit p-save">Simpan</button>
+          <button type="button" class="p-edit" id="btn-batal">Batal</button>
+        </div>
+      </form>
+    </section>
+
+    <!-- ===== KANAN: MATA PELAJARAN ===== -->
+    <section class="p-main" aria-label="Mata pelajaran yang diambil">
+      <h2 class="p-heading">Mata Pelajaran yang Diambil</h2>
+      <div class="p-grid" id="mapel"></div>
+    </section>
+  </main>
+
+  <script src="../public/js/profil.js"></script>
+  <script src="../public/js/notif.js"></script>
+</body>
+</html>
