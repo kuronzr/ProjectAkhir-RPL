@@ -1,15 +1,24 @@
-// Modal edit pengumuman: buka lewat ikon pensil, simpan memperbarui teks di halaman
 (function () {
   const modal = document.getElementById('editModal');
   const form = document.getElementById('editForm');
+  const title = document.getElementById('editTitle');
   const field = document.getElementById('editText');
   const notice = document.querySelector('.notice-text');
-  const openBtn = document.querySelector('.edit-btn');
+  const editBtn = document.querySelector('.edit-btn');
+  const createBtn = document.querySelector('.admin-actions .btn-create');
   let lastFocus = null;
 
-  function open() {
+  function open(mode) {
     lastFocus = document.activeElement;
-    field.value = notice.textContent.trim();
+
+    if (mode === 'create') {
+      title.textContent = 'Buat pengumuman baru';
+      field.value = '';
+    } else {
+      title.textContent = 'Edit pengumuman';
+      field.value = notice.innerText.trim();
+    }
+
     modal.hidden = false;
     document.body.classList.add('modal-open');
     field.focus();
@@ -22,15 +31,12 @@
     if (lastFocus) lastFocus.focus();
   }
 
-  openBtn.addEventListener('click', open);
+  if (editBtn) editBtn.addEventListener('click', () => open('edit'));
+  if (createBtn) createBtn.addEventListener('click', () => open('create'));
 
-  // tombol Batal dan X
   modal.querySelectorAll('[data-close]').forEach((b) => b.addEventListener('click', close));
-
-  // klik area gelap di luar kotak
   modal.addEventListener('mousedown', (e) => { if (e.target === modal) close(); });
 
-  // tombol Esc, dan Tab tetap berputar di dalam modal
   document.addEventListener('keydown', (e) => {
     if (modal.hidden) return;
     if (e.key === 'Escape') { close(); return; }
@@ -43,11 +49,9 @@
   });
 
   form.addEventListener('submit', (e) => {
-    e.preventDefault();
-    const text = field.value.trim();
-    if (!text) { field.focus(); return; }
-    notice.textContent = text;
-    // TODO: kirim `text` ke server/database di sini agar tersimpan permanen
-    close();
+    if (!field.value.trim()) {
+      e.preventDefault();
+      field.focus();
+    }
   });
 })();

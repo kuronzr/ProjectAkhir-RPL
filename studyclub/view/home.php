@@ -1,15 +1,23 @@
 <?php
 session_start();
+require_once '../config/database.php';
+require_once '../model/PengumumanModel.php';
 
-// Cek apakah user sudah login (opsional, sesuaikan dengan alur auth kamu)
 if (!isset($_SESSION['role'])) {
-    header("Location: login.php");
-    exit;
+  header("Location: login.php");
+  exit;
 }
 
 $role = strtolower($_SESSION['role']);
-// $role = 'adm'; // Contoh role, ganti dengan session yang sesuai
 $isAdmin = ($role === 'admin');
+
+// Ambil pengumuman dari database
+$database = new Database();
+$db = $database->getConnection();
+$announcementModel = new AnnouncementModel($db);
+$pengumuman = $announcementModel->getAnnouncement();
+
+$isiPengumuman = $pengumuman ? $pengumuman['isi'] : 'Belum ada pengumuman saat ini.';
 ?>
 <!DOCTYPE html>
 <html lang="id">
@@ -58,7 +66,11 @@ $isAdmin = ($role === 'admin');
           <!-- Actions User Biasa -->
           <a href="../view/premium.html" class="btn-premium">Premium</a>
           <button class="icon-btn" aria-label="Notifikasi">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+              stroke-linejoin="round">
+              <path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9" />
+              <path d="M13.7 21a2 2 0 0 1-3.4 0" />
+            </svg>
           </button>
           <a href="../view/profil.html" class="avatar" aria-label="Profil"></a>
         <?php endif; ?>
@@ -81,10 +93,7 @@ $isAdmin = ($role === 'admin');
             <path d="M7 14l1.2 5.2a1 1 0 0 0 1 .8h1.3a1 1 0 0 0 1-1.2L10.7 16" />
           </svg>
 
-          <p class="notice-text">lorem ipsum dolor sit amet consectetur adipiscing elit sint officia eu aute qui ad esse
-            eu esse minus exercitation nulla et quod iusto officia tempor duis dignissimos id velit est nam optio non
-            cupiditate dolor exercitation corrupti ut excepteur cupidatat aliqua consequat dolorum praesentium culpa
-            similique est occaecat ut est deserunt cillum cumque elit officia animi nihil nulla dolor expedita</p>
+          <p class="notice-text" id="currentNoticeText"><?= nl2br(htmlspecialchars($isiPengumuman)) ?></p>
 
           <button type="button" class="edit-btn" aria-label="Edit pengumuman">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"
@@ -108,7 +117,10 @@ $isAdmin = ($role === 'admin');
       <!-- ===== BANNER / CAROUSEL ===== -->
       <section class="container carousel" aria-label="Banner promosi">
         <button class="arrow prev" aria-label="Sebelumnya">
-          <svg viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
+          <svg viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="3" stroke-linecap="round"
+            stroke-linejoin="round">
+            <path d="M15 18l-6-6 6-6" />
+          </svg>
         </button>
 
         <div class="slides">
@@ -125,41 +137,52 @@ $isAdmin = ($role === 'admin');
         <div class="dots"></div>
 
         <button class="arrow next" aria-label="Berikutnya">
-          <svg viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>
+          <svg viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="3" stroke-linecap="round"
+            stroke-linejoin="round">
+            <path d="M9 18l6-6-6-6" />
+          </svg>
         </button>
       </section>
 
       <!-- ===== TEKS BERJALAN ===== -->
       <div class="ticker" aria-hidden="true">
-        <span class="track">Pendaftaran anggota baru batch semester ini resmi dibuka. Pelajari Web Development, UI/UX, hingga Data Science langsung dari praktik dan proyek kolaboratif—terbuka untuk seluruh mahasiswa Informatika dari tingkat pemula hingga mahir.</span>
+        <span class="track">Pendaftaran anggota baru batch semester ini resmi dibuka. Pelajari Web Development, UI/UX,
+          hingga Data Science langsung dari praktik dan proyek kolaboratif—terbuka untuk seluruh mahasiswa Informatika
+          dari tingkat pemula hingga mahir.</span>
       </div>
 
       <div class="container">
         <!-- ===== PENGUMUMAN ===== -->
         <section class="notice" aria-label="Pengumuman">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11v2a1 1 0 0 0 1 1h3l8 5V5L7 10H4a1 1 0 0 0-1 1z"/><path d="M18.5 9a4 4 0 0 1 0 6"/><path d="M7 14l1.2 5.2a1 1 0 0 0 1 .8h1.3a1 1 0 0 0 1-1.2L10.7 16"/></svg>
-          <p>Halo, Mahasiswa Informatika! Merasa materi perkuliahan saja belum cukup untuk menghadapi dunia industri IT? Atau punya banyak ide aplikasi keren tapi bingung harus mulai mengeksekusinya dari mana dan bersama siapa?
-
-Study Club Informatika kembali membuka pintu bagi kamu yang ingin bertumbuh, berkolaborasi, dan mengeksplorasi teknologi lebih dalam. Di sini, kamu tidak hanya belajar secara teori, tetapi juga akan langsung terlibat dalam hands-on workshop, bedah studi kasus, persiapan kompetisi IT (Gemastik, Hackathon, Competitive Programming), hingga membangun proyek kolaboratif yang siap mempercantik portofoliomu.</p>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"
+            stroke-linejoin="round">
+            <path d="M3 11v2a1 1 0 0 0 1 1h3l8 5V5L7 10H4a1 1 0 0 0-1 1z" />
+            <path d="M18.5 9a4 4 0 0 1 0 6" />
+            <path d="M7 14l1.2 5.2a1 1 0 0 0 1 .8h1.3a1 1 0 0 0 1-1.2L10.7 16" />
+          </svg>
+          <p><?= nl2br(htmlspecialchars($isiPengumuman)) ?></p>
         </section>
 
         <!-- ===== TESTIMONI (2 x 2) ===== -->
         <section class="testi" aria-label="Testimoni">
           <article class="testi-card">
             <div class="testi-ava" aria-hidden="true">K</div>
-            <p class="testi-text">Materi dan praktikumnya tersusun rapi, jadi belajar bareng di Study Club terasa jauh lebih terarah.</p>
+            <p class="testi-text">Materi dan praktikumnya tersusun rapi, jadi belajar bareng di Study Club terasa jauh
+              lebih terarah.</p>
             <h3 class="testi-name">Jerome Polin</h3>
           </article>
 
           <article class="testi-card">
             <div class="testi-ava" aria-hidden="true">Z</div>
-            <p class="testi-text">Sesi tanya jawab dengan mentor sangat membantu waktu saya buntu mengerjakan tugas praktikum.</p>
+            <p class="testi-text">Sesi tanya jawab dengan mentor sangat membantu waktu saya buntu mengerjakan tugas
+              praktikum.</p>
             <h3 class="testi-name">Kanye West</h3>
           </article>
 
           <article class="testi-card">
             <div class="testi-ava" aria-hidden="true">F</div>
-            <p class="testi-text">Jadwal kegiatan yang jelas bikin saya tidak pernah ketinggalan pertemuan dan materi baru.</p>
+            <p class="testi-text">Jadwal kegiatan yang jelas bikin saya tidak pernah ketinggalan pertemuan dan materi
+              baru.</p>
             <h3 class="testi-name">Windah Basudara</h3>
           </article>
 
@@ -186,9 +209,10 @@ Study Club Informatika kembali membuka pintu bagi kamu yang ingin bertumbuh, ber
           </button>
         </div>
 
-        <form id="editForm">
+        <form id="editForm" action="../control/prosesPengumuman.php" method="POST">
           <label for="editText" class="sr-only">Isi pengumuman</label>
-          <textarea id="editText" rows="8" required placeholder="Tulis pengumuman di sini..."></textarea>
+          <textarea id="editText" name="isi" rows="8" required
+            placeholder="Tulis pengumuman di sini..."><?= htmlspecialchars($isiPengumuman) ?></textarea>
 
           <div class="modal-foot">
             <button type="button" class="btn-ghost" data-close>Batal</button>
