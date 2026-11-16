@@ -1,4 +1,3 @@
-// Checkout: pilih paket (dari ?paket=), ringkasan harga, validasi, konfirmasi
 (function () {
   const PAKET = {
     bulanan: { label: 'Premium bulanan', harga: 159000 },
@@ -7,6 +6,8 @@
   const PAJAK = 2000;
 
   const form = document.getElementById('checkout');
+  if (!form) return;
+
   const rp = (n) => 'Rp ' + n.toLocaleString('id-ID');
   const $ = (id) => document.getElementById(id);
 
@@ -21,7 +22,6 @@
     $('s-total').textContent = rp(p.harga + PAJAK);
   }
 
-  // Paket awal dari link "Langganan"
   const awal = new URLSearchParams(location.search).get('paket');
   if (awal && PAKET[awal]) {
     form.querySelector('input[name="paket"][value="' + awal + '"]').checked = true;
@@ -29,7 +29,6 @@
   form.querySelectorAll('input[name="paket"]').forEach((r) => r.addEventListener('change', updateRingkasan));
   updateRingkasan();
 
-  // Validasi
   function setErr(name, msg) {
     const p = form.querySelector('.err[data-for="' + name + '"]');
     if (p) p.textContent = msg;
@@ -37,7 +36,7 @@
     if (inp && inp.classList) inp.classList.toggle('invalid', !!msg);
   }
 
-  form.addEventListener('submit', (e) => {
+  form.addEventListener('submit', async (e) => {
     e.preventDefault();
     const v = {
       nama: form.nama.value.trim(),
@@ -59,23 +58,48 @@
       return;
     }
 
-    const p = PAKET[paketDipilih()];
-    const total = p.harga + PAJAK;
-    try {
-      localStorage.setItem('studyclub_premium', JSON.stringify({
-        paket: paketDipilih(), nama: v.nama, negara: v.negara, alamat: v.alamat,
-        metode: v.metode, total: total, waktu: new Date().toISOString()
-      }));
-    } catch (err) {}
+    const submitBtn = $('btn-submit-pay');
+    if (submitBtn) {
+      submitBtn.disabled = true;
+      submitBtn.textContent = 'Memproses...';
+    }
 
-    $('sukses-teks').textContent =
-      'Terima kasih, ' + v.nama + '. ' + p.label + ' dengan total ' + rp(total) +
-      ' akan dibayar lewat ' + v.metode + '.';
-    $('sukses').hidden = false;
-    document.querySelector('#sukses .btn-pay').focus();
+    try {
+      const formData = new FormData();
+      formData.append('paket', paketDipilih());
+      formData.append('nama', v.nama);
+      formData.append('negara', v.negara);
+      formData.append('alamat', v.alamat);
+      formData.append('metode', v.metode);
+
+      const res = await fetch('../control/prosesCheckout.php', {
+        method: 'POST',
+        body: formData
+      });
+      const result = await res.json();
+
+      if (result.success) {
+        const p = PAKET[paketDipilih()];
+        const total = p.harga + PAJAK;
+
+        $('sukses-teks').textContent =
+          'Terima kasih, ' + v.nama + '. Pengajuan ' + p.label + ' sebesar ' + rp(total) +
+          ' via ' + v.metode + ' telah dikirim dan sedang menunggu persetujuan Admin.';
+        $('sukses').hidden = false;
+        document.querySelector('#sukses .btn-pay').focus();
+      } else {
+        alert(result.message || 'Gagal memproses pengajuan.');
+      }
+    } catch (err) {
+      alert('Gagal terhubung ke server.');
+    } finally {
+      if (submitBtn) {
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'Berlangganan';
+      }
+    }
   });
 
-  // Hapus pesan error saat pengguna memperbaiki isian
   form.addEventListener('input', (e) => {
     const n = e.target.name || e.target.id;
     if (n === 'terms') setErr('terms', '');

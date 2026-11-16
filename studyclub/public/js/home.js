@@ -1,4 +1,3 @@
-// Carousel sederhana: tombol panah, titik, dan otomatis tiap 5 detik
 (function () {
   const slides = document.querySelectorAll('.slide');
   const dotsBox = document.querySelector('.dots');

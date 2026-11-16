@@ -1,23 +1,16 @@
-// Halaman admin: daftar pengajuan subscription study club
 (function () {
-  // Data contoh. Ganti dengan data dari backend/API jika sudah ada.
-  const data = [
-    { id: 1, nama: 'Ahmad Kanabawi',     jenis: 'Bulanan',  bayar: 'Gopay', tgl: '2026-11-10', status: 'menunggu' },
-    { id: 2, nama: 'Mas Amba',   jenis: 'Tahunan',  bayar: 'Gopay',          tgl: '2026-11-10', status: 'menunggu' },
-    { id: 3, nama: 'Reza Auditore', jenis: 'Bulanan',  bayar: 'Shopeepay',      tgl: '2026-11-11', status: 'menunggu' },
-    { id: 4, nama: 'Gibran Mundur',   jenis: 'Bulanan', bayar: 'Shopeepay', tgl: '2026-11-12', status: 'menunggu' },
-    { id: 5, nama: 'Windah Basudara',    jenis: 'Tahunan',  bayar: 'Gopay',  tgl: '2026-11-13', status: 'menunggu' }
-  ];
-
-  const BULAN = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'];
-
-  const rowsEl   = document.getElementById('rows');
+  const rowsEl = document.getElementById('rows');
   const filterEl = document.getElementById('filter');
-  const countEl  = document.getElementById('count');
-  const toastEl  = document.getElementById('toast');
+  const countEl = document.getElementById('count');
+  const toastEl = document.getElementById('toast');
+  if (!rowsEl) return;
+
+  const data = JSON.parse(rowsEl.dataset.pengajuan || '[]');
+  const BULAN = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'];
   let toastTimer;
 
   function formatTanggal(iso) {
+    if (!iso) return '-';
     const [y, m, d] = iso.split('-');
     return parseInt(d, 10) + ' ' + BULAN[parseInt(m, 10) - 1] + ' ' + y;
   }
@@ -59,18 +52,17 @@
 
     rowsEl.innerHTML = list.map((d, i) =>
       '<tr>' +
-        '<td class="num">' + (i + 1) + '</td>' +
-        '<td>' + esc(d.nama) + '</td>' +
-        '<td>' + esc(d.jenis) + '</td>' +
-        '<td>' + esc(d.bayar) + '</td>' +
-        '<td>' + formatTanggal(d.tgl) + '</td>' +
-        '<td>' + aksiHtml(d) + '</td>' +
+      '<td class="num">' + (i + 1) + '</td>' +
+      '<td>' + esc(d.nama) + '</td>' +
+      '<td>' + esc(d.jenis) + '</td>' +
+      '<td>' + esc(d.bayar) + '</td>' +
+      '<td>' + formatTanggal(d.tgl) + '</td>' +
+      '<td>' + aksiHtml(d) + '</td>' +
       '</tr>'
     ).join('');
   }
 
-  // Tombol Terima / Tolak
-  rowsEl.addEventListener('click', function (e) {
+  rowsEl.addEventListener('click', async function (e) {
     const btn = e.target.closest('button[data-id]');
     if (!btn) return;
 
@@ -79,13 +71,33 @@
     const item = data.find(d => d.id === id);
     if (!item) return;
 
-    // TODO: kirim ke backend, mis. fetch('/api/subscription/' + id, { method: 'POST', body: ... })
-    item.status = aksi;
-    toast('Pengajuan ' + item.nama + ' ' + aksi);
-    render();
+    btn.disabled = true;
+    try {
+      const formData = new FormData();
+      formData.append('action', 'verifikasi');
+      formData.append('id', id);
+      formData.append('aksi', aksi);
+
+      const res = await fetch('../control/prosesCheckout.php', {
+        method: 'POST',
+        body: formData
+      });
+      const result = await res.json();
+
+      if (result.success) {
+        item.status = aksi;
+        toast('Pengajuan ' + item.nama + ' ' + aksi);
+        render();
+      } else {
+        toast(result.message || 'Gagal memperbarui status.');
+        btn.disabled = false;
+      }
+    } catch (err) {
+      toast('Gagal terhubung ke server.');
+      btn.disabled = false;
+    }
   });
 
   filterEl.addEventListener('change', render);
-
   render();
 })();

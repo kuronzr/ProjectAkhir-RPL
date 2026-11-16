@@ -1,5 +1,22 @@
+<?php
+session_start();
+require_once '../config/database.php';
+require_once '../model/SubscriptionModel.php';
+
+if (!isset($_SESSION['role'])) {
+  header("Location: login.php");
+  exit;
+}
+
+$db = (new Database())->getConnection();
+$subModel = new SubscriptionModel($db);
+$membership = $subModel->getUserMembership($_SESSION['user_id']);
+$isPremium = ($membership === 'premium');
+$namaDefault = $_SESSION['nama'] ?? '';
+?>
 <!DOCTYPE html>
 <html lang="id">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -7,37 +24,42 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/studyclub/public/CSS/style.css">
+  <link rel="stylesheet" href="../public/CSS/style.css">
 </head>
+
 <body>
 
   <!-- ===== HEADER ===== -->
   <header class="header">
     <div class="bar">
-      <a href="/studyclub/public/view/home.html" class="logo"><img src="/studyclub/public/img/logo.png" alt="Study Club"></a>
+      <a href="home.php" class="logo"><img src="../public/img/logo.png" alt="Study Club"></a>
 
       <nav aria-label="Menu utama">
         <ul class="nav">
-          <li><a href="/studyclub/public/view/home.html">Home</a></li>
-          <li><a href="/studyclub/public/view/course.html">Course</a></li>
-          <li><a href="/studyclub/public/view/schedule-anggota.html">Schedule</a></li>
-          <li><a href="/studyclub/public/view/announcement.html">Announcement</a></li>
-          <li><a href="/studyclub/public/view/testimony.html">Testimony</a></li>
+          <li><a href="home.php">Home</a></li>
+          <li><a href="course.php">Course</a></li>
+          <li><a href="schedule.php">Schedule</a></li>
         </ul>
       </nav>
 
       <div class="actions">
-        <a href="/studyclub/public/view/premium.html" class="btn-premium">Premium</a>
+        <a href="premium.php" class="btn-premium" id="header-status-btn">
+          <?= $isPremium ? 'Premium' : 'Reguler' ?>
+        </a>
         <button class="icon-btn" aria-label="Notifikasi">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+            stroke-linejoin="round">
+            <path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9" />
+            <path d="M13.7 21a2 2 0 0 1-3.4 0" />
+          </svg>
         </button>
-        <a href="/studyclub/public/view/profil.html" class="avatar" aria-label="Profil"></a>
+        <a href="profil.html" class="avatar" aria-label="Profil"></a>
       </div>
     </div>
   </header>
 
   <main class="container">
-    <a class="back" href="/studyclub/public/view/premium.html">&larr; Kembali ke paket</a>
+    <a class="back" href="premium.php">&larr; Kembali ke paket</a>
     <h1 class="page-title">Pilih Paket Premium</h1>
 
     <form id="checkout" class="layout" novalidate>
@@ -67,7 +89,8 @@
           <h2>Detail Pembayaran</h2>
           <div class="field">
             <label for="nama">Nama Lengkap</label>
-            <input type="text" id="nama" name="nama" autocomplete="name" placeholder="Nama sesuai identitas">
+            <input type="text" id="nama" name="nama" autocomplete="name" value="<?= htmlspecialchars($namaDefault) ?>"
+              placeholder="Nama sesuai identitas">
             <p class="err" data-for="nama"></p>
           </div>
           <div class="field">
@@ -77,7 +100,8 @@
           </div>
           <div class="field">
             <label for="alamat">Alamat</label>
-            <input type="text" id="alamat" name="alamat" autocomplete="street-address" placeholder="Jalan, kota, kode pos">
+            <input type="text" id="alamat" name="alamat" autocomplete="street-address"
+              placeholder="Jalan, kota, kode pos">
             <p class="err" data-for="alamat"></p>
           </div>
         </section>
@@ -89,7 +113,12 @@
             <label class="method">
               <input type="radio" name="metode" value="Gopay">
               <span class="m-icon gopay" aria-hidden="true">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="6" width="18" height="13" rx="3"/><path d="M3 10h18"/><circle cx="16.5" cy="14.5" r="1"/></svg>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"
+                  stroke-linejoin="round">
+                  <rect x="3" y="6" width="18" height="13" rx="3" />
+                  <path d="M3 10h18" />
+                  <circle cx="16.5" cy="14.5" r="1" />
+                </svg>
               </span>
               <span class="m-name">Gopay</span>
               <span class="dot"></span>
@@ -97,7 +126,12 @@
             <label class="method">
               <input type="radio" name="metode" value="ShopeePay">
               <span class="m-icon shopee" aria-hidden="true">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="6" width="18" height="13" rx="3"/><path d="M3 10h18"/><circle cx="16.5" cy="14.5" r="1"/></svg>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"
+                  stroke-linejoin="round">
+                  <rect x="3" y="6" width="18" height="13" rx="3" />
+                  <path d="M3 10h18" />
+                  <circle cx="16.5" cy="14.5" r="1" />
+                </svg>
               </span>
               <span class="m-name">ShopeePay</span>
               <span class="dot"></span>
@@ -111,10 +145,22 @@
       <aside class="summary" aria-label="Ringkasan pesanan">
         <h2>Premium Plan</h2>
         <dl class="rows">
-          <div><dt id="s-label">Premium bulanan</dt><dd id="s-harga">Rp 159.000</dd></div>
-          <div><dt>Subtotal</dt><dd id="s-sub">Rp 159.000</dd></div>
-          <div><dt>Pajak</dt><dd id="s-pajak">Rp 2.000</dd></div>
-          <div class="total"><dt>Total</dt><dd id="s-total">Rp 161.000</dd></div>
+          <div>
+            <dt id="s-label">Premium bulanan</dt>
+            <dd id="s-harga">Rp 159.000</dd>
+          </div>
+          <div>
+            <dt>Subtotal</dt>
+            <dd id="s-sub">Rp 159.000</dd>
+          </div>
+          <div>
+            <dt>Pajak</dt>
+            <dd id="s-pajak">Rp 2.000</dd>
+          </div>
+          <div class="total">
+            <dt>Total</dt>
+            <dd id="s-total">Rp 161.000</dd>
+          </div>
         </dl>
 
         <label class="terms">
@@ -123,7 +169,7 @@
         </label>
         <p class="err" data-for="terms"></p>
 
-        <button type="submit" class="btn-pay">Berlangganan</button>
+        <button type="submit" class="btn-pay" id="btn-submit-pay">Berlangganan</button>
         <p class="secure">Pembayaran aman &middot; batalkan kapan saja</p>
       </aside>
     </form>
@@ -133,15 +179,19 @@
   <div class="overlay" id="sukses" hidden>
     <div class="dialog" role="dialog" aria-modal="true" aria-labelledby="sukses-judul">
       <div class="check" aria-hidden="true">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"
+          stroke-linejoin="round">
+          <path d="M5 12.5l4.5 4.5L19 7.5" />
+        </svg>
       </div>
       <h2 id="sukses-judul">Pesanan diterima</h2>
       <p id="sukses-teks"></p>
-      <a href="home.html" class="btn-pay">Kembali ke Beranda</a>
+      <a href="home.php" class="btn-pay">Kembali ke Beranda</a>
     </div>
   </div>
 
-  <script src="js/checkout.js"></script>
-  <script src="js/notif.js"></script>
+  <script src="../public/js/checkout.js"></script>
+  <script src="../public/js/notif.js"></script>
 </body>
+
 </html>

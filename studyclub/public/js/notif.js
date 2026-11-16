@@ -1,4 +1,3 @@
-// Lonceng notifikasi: daftar pengumuman + pengingat jadwal, status baca disimpan di localStorage
 (function () {
   const READ_KEY = 'studyclub_notif_read';
   const SCHEDULE_KEY = 'studyclub_schedules';
@@ -25,7 +24,6 @@
     return e;
   }
 
-  // Pengingat dari jadwal yang akan datang (hari ini sampai 14 hari ke depan)
   function jadwalNotif() {
     const now = new Date();
     const pad = (n) => String(n).padStart(2, '0');
@@ -49,7 +47,6 @@
 
   const semua = () => jadwalNotif().concat(STATIS);
 
-  // Bangun komponen: bungkus tombol lonceng, tambah badge dan panel
   const wrap = el('div', 'notif-wrap');
   btn.parentNode.insertBefore(wrap, btn);
   wrap.appendChild(btn);

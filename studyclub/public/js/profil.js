@@ -1,19 +1,18 @@
-// Halaman Profil: kursus yang diambil + edit nama, bio, foto, dan kursus (disimpan di localStorage)
 (function () {
-  const KEY = 'studyclub_profil';
-  const MAPEL = [
-    { id: 'web-dev', nama: 'Web Development', kategori: 'Programming', pola: 'p-plaid' },
-    { id: 'cybersec', nama: 'Cyber Security', kategori: 'Security', pola: 'p-navy' },
-    { id: 'iot', nama: 'Internet of Things (IoT)', kategori: 'Hardware', pola: 'p-hex' },
-    { id: 'ui-ux', nama: 'UI/UX Design', kategori: 'Design', pola: 'p-diamond' }
-  ];
-  const SEMUA = MAPEL.map((m) => m.id);
-  const UKURAN_FOTO = 320;      // px, hasil foto dipotong persegi
-  const MAKS_FILE = 10 * 1024 * 1024;
+  const root = document.getElementById('profil-root');
+  if (!root) return;
 
+  const RAW_COURSES = JSON.parse(root.dataset.allCourses || '[]');
+  const MAPEL = RAW_COURSES.map((c) => ({
+    id: Number(c.id),
+    nama: c.nama_kursus,
+    kategori: c.kategori,
+    pola: (c.tema_banner || 'p-navy').startsWith('p-') ? c.tema_banner : 'p-' + c.tema_banner
+  }));
+
+  const UKURAN_FOTO = 320;
+  const MAKS_FILE = 10 * 1024 * 1024;
   const $ = (id) => document.getElementById(id);
-  const load = () => { try { return JSON.parse(localStorage.getItem(KEY)) || {}; } catch (e) { return {}; } };
-  const save = (d) => { try { localStorage.setItem(KEY, JSON.stringify(d)); return true; } catch (e) { return false; } };
 
   function el(tag, cls, text) {
     const e = document.createElement(tag);
@@ -22,15 +21,12 @@
     return e;
   }
 
-  // ---- State awal ----
-  const p = load();
-  let nama = p.nama || $('nama').textContent;
-  let bio = typeof p.bio === 'string' ? p.bio : $('bio').textContent;
-  let foto = typeof p.foto === 'string' && p.foto.indexOf('data:image/') === 0 ? p.foto : '';
-  let ambil = Array.isArray(p.mapel) ? p.mapel.filter((id) => SEMUA.indexOf(id) !== -1) : SEMUA.slice();
+  let nama = $('nama').textContent.trim();
+  let bio = $('bio').textContent.trim();
+  let foto = root.dataset.foto || '';
+  let ambil = JSON.parse(root.dataset.takenIds || '[]').map(Number);
   let fotoDraft = foto;
 
-  // ---- Tampilan ----
   function setFoto(src) {
     $('foto').style.backgroundImage = src ? 'url("' + src + '")' : '';
   }
@@ -38,14 +34,14 @@
   function renderMapel() {
     const box = $('mapel');
     box.innerHTML = '';
-    const daftar = MAPEL.filter((m) => ambil.indexOf(m.id) !== -1);
+    const daftar = MAPEL.filter((m) => ambil.includes(m.id));
     if (!daftar.length) {
       box.appendChild(el('p', 'p-empty', 'Belum ada kursus yang diambil.'));
       return;
     }
     daftar.forEach((m) => {
       const a = el('a', 'p-card');
-      a.href = 'kursus.html?course=' + m.id;
+      a.href = 'course.php?id=' + encodeURIComponent(m.id);
       a.appendChild(el('div', 'p-cover ' + m.pola));
       const info = el('div', 'p-info');
       info.appendChild(el('h3', '', m.nama));
@@ -62,7 +58,6 @@
     renderMapel();
   }
 
-  // Pilihan kursus di form edit
   MAPEL.forEach((m) => {
     const lb = el('label');
     const cb = el('input');
@@ -76,7 +71,6 @@
 
   renderProfil();
 
-  // ---- Edit ----
   const tampil = $('tampil'), form = $('form-edit');
   function buka(on) { tampil.hidden = on; form.hidden = !on; }
 
@@ -86,18 +80,17 @@
     $('in-foto').value = '';
     $('err').textContent = '';
     fotoDraft = foto;
-    cbs().forEach((cb) => { cb.checked = ambil.indexOf(cb.value) !== -1; });
+    cbs().forEach((cb) => { cb.checked = ambil.includes(Number(cb.value)); });
     buka(true);
     $('in-nama').focus();
   });
 
   $('btn-batal').addEventListener('click', () => {
-    setFoto(foto);          // buang perubahan foto yang belum disimpan
+    setFoto(foto);
     buka(false);
     $('btn-edit').focus();
   });
 
-  // Foto: pilih file, potong persegi, kecilkan, lalu pratinjau
   $('in-foto').addEventListener('change', (e) => {
     const file = e.target.files && e.target.files[0];
     if (!file) return;
@@ -129,26 +122,47 @@
     setFoto('');
   });
 
-  form.addEventListener('submit', (e) => {
+  form.addEventListener('submit', async (e) => {
     e.preventDefault();
     const namaBaru = $('in-nama').value.trim();
-    const bioBaru = $('in-bio').value.trim();
+    const bioBaru = $('in-bio').value.trim() || 'Mahasiswa Informatika, Universitas Singaperbangsa Karawang.';
     if (!namaBaru) { $('err').textContent = 'Nama tidak boleh kosong.'; return; }
-    const mapelBaru = Array.prototype.filter.call(cbs(), (cb) => cb.checked).map((cb) => cb.value);
 
-    const ok = save({ nama: namaBaru, bio: bioBaru, foto: fotoDraft, mapel: mapelBaru });
-    if (!ok) { $('err').textContent = 'Gagal menyimpan. Penyimpanan browser penuh atau diblokir.'; return; }
+    const mapelBaru = Array.prototype.filter.call(cbs(), (cb) => cb.checked).map((cb) => Number(cb.value));
 
-    nama = namaBaru; bio = bioBaru; foto = fotoDraft; ambil = mapelBaru;
-    renderProfil();
-    buka(false);
-    $('btn-edit').focus();
+    try {
+      const fd = new FormData();
+      fd.append('nama', namaBaru);
+      fd.append('bio', bioBaru);
+      fd.append('foto', fotoDraft);
+      fd.append('mapel', JSON.stringify(mapelBaru));
+
+      const res = await fetch('../control/prosesProfil.php', {
+        method: 'POST',
+        body: fd
+      });
+      const result = await res.json();
+
+      if (!result.success) {
+        $('err').textContent = result.message || 'Gagal menyimpan profil.';
+        return;
+      }
+
+      nama = namaBaru;
+      bio = bioBaru;
+      foto = fotoDraft;
+      ambil = mapelBaru;
+      renderProfil();
+      buka(false);
+      $('btn-edit').focus();
+    } catch (err) {
+      $('err').textContent = 'Gagal terhubung ke server.';
+    }
   });
 
-  // ---- Logout ----
   $('btn-logout').addEventListener('click', () => {
     if (!confirm('Yakin ingin logout?')) return;
-    try { sessionStorage.clear(); } catch (e) {}
-    window.location.href = '../view/logout.php';   // ganti sesuai file logout project kamu
+    try { sessionStorage.clear(); } catch (e) { }
+    window.location.href = '../control/prosesLogout.php';
   });
 })();

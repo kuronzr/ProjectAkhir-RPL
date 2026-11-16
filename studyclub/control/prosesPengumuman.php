@@ -4,7 +4,6 @@ session_start();
 require_once '../config/database.php';
 require_once '../model/PengumumanModel.php';
 
-// Proteksi: hanya admin yang boleh mengubah pengumuman
 if (!isset($_SESSION['role']) || strtolower($_SESSION['role']) !== 'admin') {
     header("Location: ../view/home.php");
     exit;
@@ -23,8 +22,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $database = new Database();
     $db = $database->getConnection();
     $announcementModel = new AnnouncementModel($db);
-
-    // Langsung update data pengumuman yang ada di database
     $announcementModel->saveAnnouncement($isi, $adminId);
 
     header("Location: ../view/home.php");

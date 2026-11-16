@@ -1,24 +1,40 @@
 <?php
 session_start();
-require_once '../config/database.php';
-require_once '../model/PengumumanModel.php';
 
-if (!isset($_SESSION['role'])) {
+if (!isset($_SESSION['role']) || !isset($_SESSION['user_id'])) {
   header("Location: login.php");
   exit;
 }
 
+require_once '../config/database.php';
+require_once '../model/PengumumanModel.php';
+require_once '../model/SubscriptionModel.php';
+
+$database = new Database();
+$db = $database->getConnection();
+
 $role = strtolower($_SESSION['role']);
 $isAdmin = ($role === 'admin');
 
-// Ambil pengumuman dari database
-$database = new Database();
-$db = $database->getConnection();
+$subModel = new SubscriptionModel($db);
+$membership = $subModel->getUserMembership($_SESSION['user_id']);
+$_SESSION['membership_status'] = $membership;
+$isPremium = ($membership === 'premium');
+
+if ($subModel->isUserBanned($_SESSION['user_id'])) {
+    session_unset();
+    session_destroy();
+    session_start();
+    $_SESSION['login_error'] = 'Akun Anda telah diblokir oleh Admin.';
+    header("Location: login.php");
+    exit;
+}
+
 $announcementModel = new AnnouncementModel($db);
 $pengumuman = $announcementModel->getAnnouncement();
-
 $isiPengumuman = $pengumuman ? $pengumuman['isi'] : 'Belum ada pengumuman saat ini.';
 ?>
+
 <!DOCTYPE html>
 <html lang="id">
 
@@ -44,15 +60,15 @@ $isiPengumuman = $pengumuman ? $pengumuman['isi'] : 'Belum ada pengumuman saat i
           <?php if ($isAdmin): ?>
             <!-- Header Admin -->
             <li><a href="home.php" class="current" aria-current="page">Home</a></li>
-            <li><a href="../view/course-admin.html">Course</a></li>
-            <li><a href="../view/schedule-admin.html">Schedule</a></li>
-            <li><a href="../view/pengajuan-subscription.html">Pengajuan</a></li>
-            <li><a href="../view/anggota-subscription.html">Subscription</a></li>
+            <li><a href="../view/course.php">Course</a></li>
+            <li><a href="../view/schedule.php">Schedule</a></li>
+            <li><a href="../view/pengajuan-subscription.php">Pengajuan</a></li>
+            <li><a href="../view/anggota-subscription.php">Subscription</a></li>
           <?php else: ?>
             <!-- Header User Biasa -->
             <li><a href="home.php" class="current" aria-current="page">Home</a></li>
-            <li><a href="../view/course.html">Course</a></li>
-            <li><a href="../view/schedule.html">Schedule</a></li>
+            <li><a href="../view/course.php">Course</a></li>
+            <li><a href="../view/schedule.php">Schedule</a></li>
           <?php endif; ?>
         </ul>
       </nav>
@@ -61,10 +77,14 @@ $isiPengumuman = $pengumuman ? $pengumuman['isi'] : 'Belum ada pengumuman saat i
         <?php if ($isAdmin): ?>
           <!-- Actions Khusus Admin -->
           <span class="role">Admin</span>
-          <a href="../view/profil.html" class="avatar" aria-label="Profil admin"></a>
+          <a href="../view/profil.php" class="avatar" aria-label="Profil admin"></a>
         <?php else: ?>
           <!-- Actions User Biasa -->
-          <a href="../view/premium.html" class="btn-premium">Premium</a>
+          <?php if ($isPremium): ?>
+            <span class="btn-premium" style="cursor: default;">Premium</span>
+          <?php else: ?>
+            <a href="premium.php" class="btn-premium">Reguler</a>
+          <?php endif; ?>
           <button class="icon-btn" aria-label="Notifikasi">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
               stroke-linejoin="round">
@@ -72,7 +92,7 @@ $isiPengumuman = $pengumuman ? $pengumuman['isi'] : 'Belum ada pengumuman saat i
               <path d="M13.7 21a2 2 0 0 1-3.4 0" />
             </svg>
           </button>
-          <a href="../view/profil.html" class="avatar" aria-label="Profil"></a>
+          <a href="../view/profil.php" class="avatar" aria-label="Profil"></a>
         <?php endif; ?>
       </div>
     </div>
