@@ -2,19 +2,26 @@ DROP DATABASE IF EXISTS study_club;
 CREATE DATABASE IF NOT EXISTS study_club;
 USE study_club;
 
+-- =====================================================================
+-- 1. TABEL USERS (Sesuai UserModel.php & SubscriptionModel.php)
+-- =====================================================================
 CREATE TABLE IF NOT EXISTS users (
   id INT AUTO_INCREMENT PRIMARY KEY,
   nama VARCHAR(100) NOT NULL,
   email VARCHAR(100) NOT NULL UNIQUE,
   password VARCHAR(255) NOT NULL,
   role ENUM('member', 'admin') NOT NULL DEFAULT 'member',
-  membership ENUM('reguler', 'premium') NOT NULL DEFAULT 'reguler',
+  membership_status ENUM('reguler', 'premium') NOT NULL DEFAULT 'reguler',
+  membership_expired DATE NULL,
   is_banned TINYINT(1) NOT NULL DEFAULT 0,
   bio TEXT NULL,
-  foto_profil VARCHAR(255) NULL,
+  foto VARCHAR(255) NULL,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
+-- =====================================================================
+-- 2. TABEL COURSES (Daftar Kursus)
+-- =====================================================================
 CREATE TABLE IF NOT EXISTS courses (
   id INT AUTO_INCREMENT PRIMARY KEY,
   nama_kursus VARCHAR(100) NOT NULL,
@@ -24,6 +31,26 @@ CREATE TABLE IF NOT EXISTS courses (
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
+-- =====================================================================
+-- 3. TABEL USER_COURSES (Kursus yang Diambil pada Halaman Profil)
+-- =====================================================================
+CREATE TABLE IF NOT EXISTS user_courses (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  user_id INT NOT NULL,
+  course_id INT NOT NULL,
+  enrolled_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  UNIQUE KEY unique_user_course (user_id, course_id),
+  CONSTRAINT fk_uc_user
+    FOREIGN KEY (user_id) REFERENCES users(id)
+    ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT fk_uc_course
+    FOREIGN KEY (course_id) REFERENCES courses(id)
+    ON DELETE CASCADE ON UPDATE CASCADE
+);
+
+-- =====================================================================
+-- 4. TABEL COURSE_MATERIALS (Materi Kursus + Kunci Khusus Premium)
+-- =====================================================================
 CREATE TABLE IF NOT EXISTS course_materials (
   id INT AUTO_INCREMENT PRIMARY KEY,
   course_id INT NOT NULL,
@@ -40,6 +67,9 @@ CREATE TABLE IF NOT EXISTS course_materials (
     ON DELETE CASCADE ON UPDATE CASCADE
 );
 
+-- =====================================================================
+-- 5. TABEL COURSE_PRACTICALS (Daftar Praktikum / Tugas)
+-- =====================================================================
 CREATE TABLE IF NOT EXISTS course_practicals (
   id INT AUTO_INCREMENT PRIMARY KEY,
   course_id INT NOT NULL,
@@ -53,6 +83,9 @@ CREATE TABLE IF NOT EXISTS course_practicals (
     ON DELETE CASCADE ON UPDATE CASCADE
 );
 
+-- =====================================================================
+-- 6. TABEL PRACTICAL_SUBMISSIONS (Pengumpulan Tugas Praktikum)
+-- =====================================================================
 CREATE TABLE IF NOT EXISTS practical_submissions (
   id INT AUTO_INCREMENT PRIMARY KEY,
   practical_id INT NOT NULL,
@@ -67,21 +100,28 @@ CREATE TABLE IF NOT EXISTS practical_submissions (
     ON DELETE CASCADE ON UPDATE CASCADE
 );
 
+-- =====================================================================
+-- 7. TABEL SUBSCRIPTIONS (Pengajuan & Status Langganan Premium)
+-- =====================================================================
 CREATE TABLE IF NOT EXISTS subscriptions (
   id INT AUTO_INCREMENT PRIMARY KEY,
   user_id INT NOT NULL,
   paket ENUM('bulanan', 'tahunan') NOT NULL,
-  harga INT NOT NULL,
+  nama_lengkap VARCHAR(100) NOT NULL,
+  negara VARCHAR(60) NOT NULL,
+  alamat TEXT NOT NULL,
   metode_pembayaran VARCHAR(50) NOT NULL,
-  nomor_hp VARCHAR(30) NULL,
+  total_bayar INT NOT NULL,
   status ENUM('pending', 'approved', 'rejected') NOT NULL DEFAULT 'pending',
-  tanggal_pengajuan TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  tanggal_berakhir DATE NULL,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   CONSTRAINT fk_subs_user
     FOREIGN KEY (user_id) REFERENCES users(id)
     ON DELETE CASCADE ON UPDATE CASCADE
 );
 
+-- =====================================================================
+-- 8. TABEL SCHEDULES (Jadwal Kegiatan Study Club)
+-- =====================================================================
 CREATE TABLE IF NOT EXISTS schedules (
   id INT AUTO_INCREMENT PRIMARY KEY,
   course_id INT NULL,
@@ -98,6 +138,9 @@ CREATE TABLE IF NOT EXISTS schedules (
     ON DELETE SET NULL ON UPDATE CASCADE
 );
 
+-- =====================================================================
+-- 9. TABEL ANNOUNCEMENTS (Pengumuman di Halaman Home)
+-- =====================================================================
 CREATE TABLE IF NOT EXISTS announcements (
   id INT AUTO_INCREMENT PRIMARY KEY,
   isi TEXT NOT NULL,
