@@ -2,6 +2,7 @@
 session_start();
 require_once '../config/database.php';
 require_once '../model/courseModel.php';
+require_once '../control/prosesProfil.php';
 
 if (!isset($_SESSION['role']) || strtolower($_SESSION['role']) !== 'admin') {
   header("Location: course.php");
@@ -11,8 +12,8 @@ if (!isset($_SESSION['role']) || strtolower($_SESSION['role']) !== 'admin') {
 $courseId = (int) ($_GET['course'] ?? 0);
 $type = ($_GET['type'] ?? 'materi') === 'praktikum' ? 'praktikum' : 'materi';
 $isPrak = ($type === 'praktikum');
-
 $db = (new Database())->getConnection();
+$fotoHeader = getFotoProfil($db);
 $courseModel = new CourseModel($db);
 $course = $courseModel->getCourseById($courseId);
 
@@ -51,7 +52,11 @@ if (!$course) {
       </nav>
       <div class="actions">
         <span class="role">Admin</span>
-        <a href="profil.php" class="avatar" aria-label="Profil admin"></a>
+        <a href="profil.php" class="avatar" aria-label="Profil admin">
+          <?php if (!empty($fotoHeader)): ?>
+            <img src="<?= htmlspecialchars($fotoHeader, ENT_QUOTES, 'UTF-8') ?>" alt="Profil">
+          <?php endif; ?>
+        </a>
       </div>
     </div>
   </header>

@@ -7,10 +7,13 @@ if (!isset($_SESSION['role']) || strtolower($_SESSION['role']) !== 'admin') {
 
 require_once '../config/database.php';
 require_once '../model/SubscriptionModel.php';
+require_once '../control/prosesProfil.php';
 
 $db = (new Database())->getConnection();
 $subModel = new SubscriptionModel($db);
 $rawMembers = $subModel->getAllMembersWithSubscription();
+
+$fotoHeader = getFotoProfil($db);
 
 $formattedMembers = array_map(function ($row) {
   $isPremium = ($row['membership_status'] === 'premium');
@@ -58,7 +61,11 @@ $formattedMembers = array_map(function ($row) {
 
       <div class="actions">
         <span class="role">Admin</span>
-        <a href="profil.php" class="avatar" aria-label="Profil admin"></a>
+        <a href="profil.php" class="avatar" aria-label="Profil admin">
+          <?php if (!empty($fotoHeader)): ?>
+            <img src="<?= htmlspecialchars($fotoHeader, ENT_QUOTES, 'UTF-8') ?>" alt="Profil">
+          <?php endif; ?>
+        </a>
       </div>
     </div>
   </header>

@@ -2,9 +2,6 @@ DROP DATABASE IF EXISTS study_club;
 CREATE DATABASE IF NOT EXISTS study_club;
 USE study_club;
 
--- =====================================================================
--- 1. TABEL USERS (Sesuai UserModel.php & SubscriptionModel.php)
--- =====================================================================
 CREATE TABLE IF NOT EXISTS users (
   id INT AUTO_INCREMENT PRIMARY KEY,
   nama VARCHAR(100) NOT NULL,
@@ -19,9 +16,6 @@ CREATE TABLE IF NOT EXISTS users (
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
--- =====================================================================
--- 2. TABEL COURSES (Daftar Kursus)
--- =====================================================================
 CREATE TABLE IF NOT EXISTS courses (
   id INT AUTO_INCREMENT PRIMARY KEY,
   nama_kursus VARCHAR(100) NOT NULL,
@@ -31,9 +25,6 @@ CREATE TABLE IF NOT EXISTS courses (
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
--- =====================================================================
--- 3. TABEL USER_COURSES (Kursus yang Diambil pada Halaman Profil)
--- =====================================================================
 CREATE TABLE IF NOT EXISTS user_courses (
   id INT AUTO_INCREMENT PRIMARY KEY,
   user_id INT NOT NULL,
@@ -48,9 +39,6 @@ CREATE TABLE IF NOT EXISTS user_courses (
     ON DELETE CASCADE ON UPDATE CASCADE
 );
 
--- =====================================================================
--- 4. TABEL COURSE_MATERIALS (Materi Kursus + Kunci Khusus Premium)
--- =====================================================================
 CREATE TABLE IF NOT EXISTS course_materials (
   id INT AUTO_INCREMENT PRIMARY KEY,
   course_id INT NOT NULL,
@@ -67,9 +55,6 @@ CREATE TABLE IF NOT EXISTS course_materials (
     ON DELETE CASCADE ON UPDATE CASCADE
 );
 
--- =====================================================================
--- 5. TABEL COURSE_PRACTICALS (Daftar Praktikum / Tugas)
--- =====================================================================
 CREATE TABLE IF NOT EXISTS course_practicals (
   id INT AUTO_INCREMENT PRIMARY KEY,
   course_id INT NOT NULL,
@@ -83,9 +68,6 @@ CREATE TABLE IF NOT EXISTS course_practicals (
     ON DELETE CASCADE ON UPDATE CASCADE
 );
 
--- =====================================================================
--- 6. TABEL PRACTICAL_SUBMISSIONS (Pengumpulan Tugas Praktikum)
--- =====================================================================
 CREATE TABLE IF NOT EXISTS practical_submissions (
   id INT AUTO_INCREMENT PRIMARY KEY,
   practical_id INT NOT NULL,
@@ -100,9 +82,6 @@ CREATE TABLE IF NOT EXISTS practical_submissions (
     ON DELETE CASCADE ON UPDATE CASCADE
 );
 
--- =====================================================================
--- 7. TABEL SUBSCRIPTIONS (Pengajuan & Status Langganan Premium)
--- =====================================================================
 CREATE TABLE IF NOT EXISTS subscriptions (
   id INT AUTO_INCREMENT PRIMARY KEY,
   user_id INT NOT NULL,
@@ -119,18 +98,15 @@ CREATE TABLE IF NOT EXISTS subscriptions (
     ON DELETE CASCADE ON UPDATE CASCADE
 );
 
--- =====================================================================
--- 8. TABEL SCHEDULES (Jadwal Kegiatan Study Club)
--- =====================================================================
 CREATE TABLE IF NOT EXISTS schedules (
   id INT AUTO_INCREMENT PRIMARY KEY,
   course_id INT NULL,
-  judul_kegiatan VARCHAR(150) NOT NULL,
+  nama_kegiatan VARCHAR(150) NOT NULL,
   kategori VARCHAR(50) NOT NULL,
   tanggal DATE NOT NULL,
   waktu_mulai TIME NOT NULL,
   waktu_selesai TIME NOT NULL,
-  lokasi_atau_link VARCHAR(255) NOT NULL,
+  lokasi VARCHAR(255) NOT NULL,
   deskripsi TEXT NULL,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   CONSTRAINT fk_schedule_course
@@ -138,9 +114,6 @@ CREATE TABLE IF NOT EXISTS schedules (
     ON DELETE SET NULL ON UPDATE CASCADE
 );
 
--- =====================================================================
--- 9. TABEL ANNOUNCEMENTS (Pengumuman di Halaman Home)
--- =====================================================================
 CREATE TABLE IF NOT EXISTS announcements (
   id INT AUTO_INCREMENT PRIMARY KEY,
   isi TEXT NOT NULL,

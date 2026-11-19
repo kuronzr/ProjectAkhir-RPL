@@ -9,6 +9,8 @@ if (!isset($_SESSION['role']) || !isset($_SESSION['user_id'])) {
 require_once '../config/database.php';
 require_once '../model/PengumumanModel.php';
 require_once '../model/SubscriptionModel.php';
+require_once '../control/prosesProfil.php';
+
 
 $database = new Database();
 $db = $database->getConnection();
@@ -20,14 +22,15 @@ $subModel = new SubscriptionModel($db);
 $membership = $subModel->getUserMembership($_SESSION['user_id']);
 $_SESSION['membership_status'] = $membership;
 $isPremium = ($membership === 'premium');
+$fotoHeader = getFotoProfil($db);
 
 if ($subModel->isUserBanned($_SESSION['user_id'])) {
-    session_unset();
-    session_destroy();
-    session_start();
-    $_SESSION['login_error'] = 'Akun Anda telah diblokir oleh Admin.';
-    header("Location: login.php");
-    exit;
+  session_unset();
+  session_destroy();
+  session_start();
+  $_SESSION['login_error'] = 'Akun Anda telah diblokir oleh Admin.';
+  header("Location: login.php");
+  exit;
 }
 
 $announcementModel = new AnnouncementModel($db);
@@ -92,7 +95,11 @@ $isiPengumuman = $pengumuman ? $pengumuman['isi'] : 'Belum ada pengumuman saat i
               <path d="M13.7 21a2 2 0 0 1-3.4 0" />
             </svg>
           </button>
-          <a href="../view/profil.php" class="avatar" aria-label="Profil"></a>
+          <a href="profil.php" class="avatar" aria-label="Profil">
+            <?php if (!empty($fotoHeader)): ?>
+              <img src="<?= htmlspecialchars($fotoHeader, ENT_QUOTES, 'UTF-8') ?>" alt="Profil">
+            <?php endif; ?>
+          </a>
         <?php endif; ?>
       </div>
     </div>

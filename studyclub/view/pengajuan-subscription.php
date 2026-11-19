@@ -7,8 +7,10 @@ if (!isset($_SESSION['role']) || strtolower($_SESSION['role']) !== 'admin') {
 
 require_once '../config/database.php';
 require_once '../model/SubscriptionModel.php';
+require_once '../control/prosesProfil.php';
 
 $db = (new Database())->getConnection();
+$fotoHeader = getFotoProfil($db);
 $subModel = new SubscriptionModel($db);
 $rawList = $subModel->getAllSubscriptions();
 
@@ -60,7 +62,11 @@ $formattedData = array_map(function ($row) use ($statusMap) {
 
       <div class="actions">
         <span class="role">Admin</span>
-        <a href="profil.php" class="avatar" aria-label="Profil admin"></a>
+        <a href="profil.php" class="avatar" aria-label="Profil admin">
+          <?php if (!empty($fotoHeader)): ?>
+            <img src="<?= htmlspecialchars($fotoHeader, ENT_QUOTES, 'UTF-8') ?>" alt="Profil">
+          <?php endif; ?>
+        </a>
       </div>
     </div>
   </header>

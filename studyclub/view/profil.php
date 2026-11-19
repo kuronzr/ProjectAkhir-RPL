@@ -87,22 +87,21 @@ $takenIds = $userModel->getUserCourseIds($userId);
               <path d="M13.7 21a2 2 0 0 1-3.4 0" />
             </svg>
           </button>
-          <a href="profil.php" class="avatar" aria-label="Profil"></a>
+          <?php $avatarStyle = !empty($fotoUser) ? 'style="background-image: url(\'' . htmlspecialchars($fotoUser, ENT_QUOTES, 'UTF-8') . '\');"' : ''; ?>
+          <a href="profil.php" class="avatar" <?= $avatarStyle ?> aria-label="Profil"></a>
         <?php endif; ?>
       </div>
     </div>
   </header>
 
-  <main class="container p-layout" id="profil-root" data-foto="<?= htmlspecialchars($fotoUser, ENT_QUOTES, 'UTF-8') ?>"
-    data-all-courses="<?= htmlspecialchars(json_encode($allCourses), ENT_QUOTES, 'UTF-8') ?>"
-    data-taken-ids="<?= htmlspecialchars(json_encode($takenIds), ENT_QUOTES, 'UTF-8') ?>">
+  <main class="container p-layout" id="profil-root">
 
-    <!-- ===== KOLOM KIRI: PROFIL ===== -->
+    <!-- ===== PROFIL ===== -->
     <aside class="p-side">
-      <div class="p-photo" id="foto"></div>
+      <div class="p-photo" id="foto" data-src="<?= htmlspecialchars($fotoUser, ENT_QUOTES, 'UTF-8') ?>"></div>
 
       <!-- Mode Tampil -->
-      <div id="tampil">
+      <div id="tampil" <?= !empty($_SESSION['profil_err']) ? 'hidden' : '' ?>>
         <h1 class="p-name" id="nama"><?= htmlspecialchars($namaUser) ?></h1>
         <p class="p-bio" id="bio"><?= htmlspecialchars($bioUser) ?></p>
 
@@ -111,23 +110,45 @@ $takenIds = $userModel->getUserCourseIds($userId);
       </div>
 
       <!-- Mode Edit -->
-      <form id="form-edit" class="p-form" hidden>
+      <form id="form-edit" class="p-form" action="../control/prosesProfil.php" method="POST"
+        enctype="multipart/form-data" <?= empty($_SESSION['profil_err']) ? 'hidden' : '' ?>>
+        <input type="hidden" name="hapus_foto" id="hapus-foto-flag" value="0">
+
         <label for="in-foto">Foto profil</label>
-        <input type="file" id="in-foto" accept="image/*">
+        <input type="file" id="in-foto" name="foto" accept="image/*">
         <button type="button" class="p-edit p-small" id="btn-hapus-foto">Hapus foto</button>
 
         <label for="in-nama">Nama</label>
-        <input type="text" id="in-nama" maxlength="100" required>
+        <input type="text" id="in-nama" name="nama" maxlength="100" required
+          value="<?= htmlspecialchars($namaUser, ENT_QUOTES, 'UTF-8') ?>">
 
         <label for="in-bio">Bio</label>
-        <textarea id="in-bio" rows="3" maxlength="255"></textarea>
+        <textarea id="in-bio" name="bio" rows="3" maxlength="255"><?= htmlspecialchars($bioUser) ?></textarea>
 
         <fieldset class="p-fieldset">
           <legend>Mata Pelajaran yang Diambil</legend>
-          <div id="pilih-mapel"></div>
+          <div id="pilih-mapel">
+            <?php if (empty($allCourses)): ?>
+              <p class="p-empty">Belum ada kursus tersedia.</p>
+            <?php else: ?>
+              <?php foreach ($allCourses as $c): ?>
+                <label>
+                  <input type="checkbox" name="mapel[]" value="<?= (int) $c['id'] ?>" <?= in_array((int) $c['id'], $takenIds) ? 'checked' : '' ?>>
+                  <?= htmlspecialchars($c['nama_kursus']) ?>
+                </label>
+              <?php endforeach; ?>
+            <?php endif; ?>
+          </div>
         </fieldset>
 
-        <p class="p-err" id="err" role="alert"></p>
+        <p class="p-err" id="err" role="alert">
+          <?php
+          if (!empty($_SESSION['profil_err'])) {
+            echo htmlspecialchars($_SESSION['profil_err']);
+            unset($_SESSION['profil_err']);
+          }
+          ?>
+        </p>
 
         <div class="p-row">
           <button type="submit" class="p-edit p-save">Simpan</button>
@@ -136,16 +157,34 @@ $takenIds = $userModel->getUserCourseIds($userId);
       </form>
     </aside>
 
-    <!-- ===== KOLOM KANAN: MATA PELAJARAN YANG DIAMBIL ===== -->
+    <!-- ===== MATA PELAJARAN YANG DIAMBIL ===== -->
     <section class="p-main">
       <h2 class="p-heading">Mata Pelajaran yang Diambil</h2>
-      <div class="p-grid" id="mapel"></div>
+      <div class="p-grid" id="mapel">
+        <?php
+        $diambil = array_filter($allCourses, fn($c) => in_array((int) $c['id'], $takenIds));
+        if (empty($diambil)):
+          ?>
+          <p class="p-empty">Belum ada kursus yang diambil.</p>
+        <?php else: ?>
+          <?php foreach ($diambil as $m):
+            $pola = str_starts_with($m['tema_banner'] ?? 'p-navy', 'p-') ? $m['tema_banner'] : 'p-' . $m['tema_banner'];
+            ?>
+            <a class="p-card" href="course.php?id=<?= (int) $m['id'] ?>">
+              <div class="p-cover <?= htmlspecialchars($pola) ?>"></div>
+              <div class="p-info">
+                <h3><?= htmlspecialchars($m['nama_kursus']) ?></h3>
+                <p><?= htmlspecialchars($m['kategori']) ?></p>
+              </div>
+            </a>
+          <?php endforeach; ?>
+        <?php endif; ?>
+      </div>
     </section>
 
   </main>
 
-  <script src="../public/js/profil.js"></script>
+  <script src="../public/js/profil.js?v=6"></script>
   <script src="../public/js/notif.js"></script>
-</body>
 
 </html>

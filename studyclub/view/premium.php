@@ -2,6 +2,7 @@
 session_start();
 require_once '../config/database.php';
 require_once '../model/SubscriptionModel.php';
+require_once '../control/prosesProfil.php';
 
 if (!isset($_SESSION['role'])) {
   header("Location: login.php");
@@ -12,6 +13,7 @@ $db = (new Database())->getConnection();
 $subModel = new SubscriptionModel($db);
 $membership = $subModel->getUserMembership($_SESSION['user_id']);
 $isPremium = ($membership === 'premium');
+$fotoHeader = getFotoProfil($db);
 
 if ($isPremium) {
     header("Location: home.php");
@@ -58,7 +60,11 @@ if ($isPremium) {
             <path d="M13.7 21a2 2 0 0 1-3.4 0" />
           </svg>
         </button>
-        <a href="profil.html" class="avatar" aria-label="Profil"></a>
+        <a href="profil.php" class="avatar" aria-label="Profil">
+          <?php if (!empty($fotoHeader)): ?>
+            <img src="<?= htmlspecialchars($fotoHeader, ENT_QUOTES, 'UTF-8') ?>" alt="Profil">
+          <?php endif; ?>
+        </a>
       </div>
     </div>
   </header>

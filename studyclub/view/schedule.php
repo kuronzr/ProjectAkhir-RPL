@@ -2,16 +2,30 @@
 session_start();
 require_once '../config/database.php';
 require_once '../model/ScheduleModel.php';
+require_once '../model/SubscriptionModel.php';
+require_once '../control/prosesProfil.php';
+
 
 if (!isset($_SESSION['role'])) {
-    header("Location: login.php");
-    exit;
+  header("Location: login.php");
+  exit;
 }
 
 $isAdmin = (strtolower($_SESSION['role']) === 'admin');
 $db = (new Database())->getConnection();
+$userId = (int) $_SESSION['user_id'];
+$fotoHeader = getFotoProfil($db);
 $scheduleModel = new ScheduleModel($db);
 $schedules = $scheduleModel->getAllSchedules();
+
+$subModel = new SubscriptionModel($db);
+if ($subModel->isUserBanned($userId)) {
+  session_unset();
+  session_destroy();
+  header("Location: login.php");
+  exit;
+}
+$isPremium = ($subModel->getUserMembership($userId) === 'premium');
 ?>
 <!DOCTYPE html>
 <html lang="id">
@@ -54,22 +68,33 @@ $schedules = $scheduleModel->getAllSchedules();
           <span class="role">Admin</span>
           <a href="profil.php" class="avatar" aria-label="Profil admin"></a>
         <?php else: ?>
-          <a href="premium.php" class="btn-premium">Premium</a>
-          <button class="icon-btn" aria-label="Notifikasi">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg>
-          </button>
-          <a href="profil.php" class="avatar" aria-label="Profil"></a>
-        <?php endif; ?>
+          <div class="actions">
+            <a href="premium.php" class="btn-premium" id="header-status-btn">
+              <?= $isPremium ? 'Premium' : 'Reguler' ?>
+            </a>
+            <button class="icon-btn" aria-label="Notifikasi">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                stroke-linejoin="round">
+                <path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9" />
+                <path d="M13.7 21a2 2 0 0 1-3.4 0" />
+              </svg>
+            </button>
+            <a href="profil.php" class="avatar" aria-label="Profil">
+              <?php if (!empty($fotoHeader)): ?>
+                <img src="<?= htmlspecialchars($fotoHeader, ENT_QUOTES, 'UTF-8') ?>" alt="Profil">
+              <?php endif; ?>
+            </a>
+          <?php endif; ?>
+        </div>
       </div>
-    </div>
   </header>
 
   <main class="container">
     <h1 class="page-title">Jadwal Kegiatan</h1>
     <p class="page-sub">
       <?= $isAdmin
-          ? 'Tambahkan kegiatan belajar, praktikum, atau pertemuan Study Club.'
-          : 'Daftar kegiatan Study Club. Halaman ini hanya untuk dilihat.' ?>
+        ? 'Tambahkan kegiatan belajar, praktikum, atau pertemuan Study Club.'
+        : 'Daftar kegiatan Study Club. Halaman ini hanya untuk dilihat.' ?>
     </p>
 
     <?php if ($isAdmin): ?>
@@ -192,9 +217,8 @@ $schedules = $scheduleModel->getAllSchedules();
                 <td><?= htmlspecialchars($s['deskripsi'] ?: '-') ?></td>
                 <?php if ($isAdmin): ?>
                   <td>
-                    <a href="../control/prosesSchedule.php?delete=<?= $s['id'] ?>"
-                       class="btn-hapus-jadwal"
-                       style="color:#dc2626; font-weight:600; text-decoration:none;">Hapus</a>
+                    <a href="../control/prosesSchedule.php?delete=<?= $s['id'] ?>" class="btn-hapus-jadwal"
+                      style="color:#dc2626; font-weight:600; text-decoration:none;">Hapus</a>
                   </td>
                 <?php endif; ?>
               </tr>

@@ -8,10 +8,12 @@ if (!isset($_SESSION['role']) || !isset($_SESSION['user_id'])) {
 require_once '../config/database.php';
 require_once '../model/courseModel.php';
 require_once '../model/SubscriptionModel.php';
+require_once '../control/prosesProfil.php';
 
 $db = (new Database())->getConnection();
 $userId = (int) $_SESSION['user_id'];
 $isAdmin = (strtolower($_SESSION['role']) === 'admin');
+$fotoHeader = getFotoProfil($db);
 
 $subModel = new SubscriptionModel($db);
 if ($subModel->isUserBanned($userId)) {
@@ -31,6 +33,7 @@ $praktikumId = (int) ($_GET['praktikum'] ?? 0);
 $course = null;
 $subMode = 'list';
 $detail = null;
+$submissions = [];
 
 if ($courseId > 0) {
   $course = $courseModel->getCourseById($courseId);
@@ -50,6 +53,28 @@ if ($courseId > 0) {
   } elseif ($praktikumId > 0) {
     $subMode = 'praktikum';
     $detail = $courseModel->getPracticalById($praktikumId);
+
+    $mySubmission = null;
+    if ($detail && $isAdmin) {
+      $stmtSub = $db->prepare("
+      SELECT ps.id, ps.file_tugas, ps.submitted_at, u.nama, u.email
+      FROM practical_submissions ps
+      JOIN users u ON ps.user_id = u.id
+      WHERE ps.practical_id = :pid
+      ORDER BY ps.submitted_at DESC
+    ");
+      $stmtSub->execute([':pid' => $praktikumId]);
+      $submissions = $stmtSub->fetchAll(PDO::FETCH_ASSOC);
+    } elseif ($detail && !$isAdmin) {
+      $stmtMy = $db->prepare("
+      SELECT id, file_tugas, submitted_at
+      FROM practical_submissions
+      WHERE practical_id = :pid AND user_id = :uid
+      LIMIT 1
+    ");
+      $stmtMy->execute([':pid' => $praktikumId, ':uid' => $userId]);
+      $mySubmission = $stmtMy->fetch(PDO::FETCH_ASSOC);
+    }
   } else {
     $listPraktikum = $courseModel->getPracticalsByCourse($courseId);
     $listMateri = $courseModel->getMaterialsByCourse($courseId);
@@ -75,7 +100,7 @@ if ($courseId > 0) {
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="../public/CSS/style.css?v=3">
+  <link rel="stylesheet" href="../public/CSS/style.css?v=8">
 </head>
 
 <body>
@@ -104,7 +129,11 @@ if ($courseId > 0) {
       <div class="actions">
         <?php if ($isAdmin): ?>
           <span class="role">Admin</span>
-          <a href="profil.php" class="avatar" aria-label="Profil admin"></a>
+          <a href="profil.php" class="avatar" aria-label="Profil admin">
+            <?php if (!empty($fotoHeader)): ?>
+              <img src="<?= htmlspecialchars($fotoHeader, ENT_QUOTES, 'UTF-8') ?>" alt="Profil">
+            <?php endif; ?>
+          </a>
         <?php else: ?>
           <?php if ($isPremium): ?>
             <span class="btn-premium static">Premium</span>
@@ -118,7 +147,11 @@ if ($courseId > 0) {
               <path d="M13.7 21a2 2 0 0 1-3.4 0" />
             </svg>
           </button>
-          <a href="profil.php" class="avatar" aria-label="Profil"></a>
+          <a href="profil.php" class="avatar" aria-label="Profil">
+            <?php if (!empty($fotoHeader)): ?>
+              <img src="<?= htmlspecialchars($fotoHeader, ENT_QUOTES, 'UTF-8') ?>" alt="Profil">
+            <?php endif; ?>
+          </a>
         <?php endif; ?>
       </div>
     </div>
@@ -484,31 +517,115 @@ if ($courseId > 0) {
             </ul>
           </section>
 
-          <form action="../control/submit_praktikum.php" method="POST" enctype="multipart/form-data">
-            <input type="hidden" name="course_id" value="<?= $courseId ?>">
-            <input type="hidden" name="practical_id" value="<?= $detail['id'] ?>">
-            <input type="file" id="berkas" name="berkas" accept=".pdf,.docx" required hidden>
+          <?php if ($isAdmin): ?>
+            <section class="p-box">
+              <h2 class="p-sub">Daftar Tugas yang Dikumpulkan Mahasiswa (<?= count($submissions) ?>)</h2>
 
-            <button type="button" class="p-drop" id="drop" aria-describedby="info">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"
-                stroke-linejoin="round">
-                <path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
-                <path d="M12 16v-5" />
-                <path d="M9.5 13l2.5-2.5 2.5 2.5" />
-              </svg>
-              <span class="p-drop-title" id="drop-title">Pilih file di sini</span>
-              <span class="p-drop-info" id="info">pdf, docx, maks 10MB</span>
-            </button>
-
+              <?php if (empty($submissions)): ?>
+                <p class="m-empty">Belum ada mahasiswa yang mengumpulkan tugas praktikum ini.</p>
+              <?php else: ?>
+                <div class="table-box">
+                  <div class="table-scroll">
+                    <table>
+                      <thead>
+                        <tr>
+                          <th>No</th>
+                          <th>Nama Mahasiswa</th>
+                          <th>Email</th>
+                          <th>Waktu Kumpul</th>
+                          <th>File Tugas</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <?php foreach ($submissions as $idx => $sub): ?>
+                          <tr>
+                            <td><?= $idx + 1 ?></td>
+                            <td><?= htmlspecialchars($sub['nama']) ?></td>
+                            <td><?= htmlspecialchars($sub['email']) ?></td>
+                            <td><?= date('d M Y, H:i', strtotime($sub['submitted_at'])) ?></td>
+                            <td>
+                              <a class="c-btn solid" href="../public/uploads/tugas/<?= rawurlencode($sub['file_tugas']) ?>"
+                                target="_blank" rel="noopener">
+                                Lihat / Unduh File
+                              </a>
+                            </td>
+                          </tr>
+                        <?php endforeach; ?>
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              <?php endif; ?>
+            </section>
+          <?php else: ?>
             <?php if (!empty($_SESSION['upload_msg'])): ?>
-              <p class="p-status" role="status">
+              <p class="p-status ok" role="status">
                 <?= htmlspecialchars($_SESSION['upload_msg']);
                 unset($_SESSION['upload_msg']); ?>
               </p>
             <?php endif; ?>
 
-            <button type="submit" class="p-kirim">Unggah Tugas</button>
-          </form>
+            <?php if ($mySubmission): ?>
+              <?php
+              $fileTugas = $mySubmission['file_tugas'];
+              $fileUrl = '../public/uploads/tugas/' . rawurlencode($fileTugas);
+              $extTugas = strtolower(pathinfo($fileTugas, PATHINFO_EXTENSION));
+              ?>
+              <section class="p-box p-submitted-box">
+                <div class="p-sub-head">
+                  <div>
+                    <h2 class="p-sub-title">Tugas Sudah Dikumpulkan</h2>
+                    <p class="p-sub-meta">
+                      Dikumpulkan pada <?= date('d M Y, H:i', strtotime($mySubmission['submitted_at'])) ?>
+                    </p>
+                  </div>
+
+                  <form action="../control/submit_praktikum.php" method="POST"
+                    onsubmit="return confirm('Batalkan dan hapus tugas yang sudah diunggah?');">
+                    <input type="hidden" name="action" value="cancel">
+                    <input type="hidden" name="course_id" value="<?= $courseId ?>">
+                    <input type="hidden" name="practical_id" value="<?= $detail['id'] ?>">
+                    <button type="submit" class="p-cancel-x" title="Batalkan pengumpulan" aria-label="Batalkan pengumpulan">
+                      &times;
+                    </button>
+                  </form>
+                </div>
+
+                <div class="p-file-card">
+                  <span class="p-file-name"><?= htmlspecialchars($fileTugas) ?></span>
+                  <a href="<?= $fileUrl ?>" target="_blank" rel="noopener" class="c-btn solid">
+                    Buka / Unduh
+                  </a>
+                </div>
+
+                <?php if ($extTugas === 'pdf'): ?>
+                  <iframe class="m-pdf-frame mt-12" src="<?= $fileUrl ?>"></iframe>
+                <?php else: ?>
+                  <p class="p-docx-note">File DOCX tersimpan. Klik <strong>Buka / Unduh</strong> untuk memeriksa dokumen.</p>
+                <?php endif; ?>
+              </section>
+            <?php else: ?>
+              <form action="../control/submit_praktikum.php" method="POST" enctype="multipart/form-data">
+                <input type="hidden" name="action" value="upload">
+                <input type="hidden" name="course_id" value="<?= $courseId ?>">
+                <input type="hidden" name="practical_id" value="<?= $detail['id'] ?>">
+                <input type="file" id="berkas" name="berkas" accept=".pdf,.docx" required hidden>
+
+                <button type="button" class="p-drop" id="drop" aria-describedby="info">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"
+                    stroke-linejoin="round">
+                    <path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
+                    <path d="M12 16v-5" />
+                    <path d="M9.5 13l2.5-2.5 2.5 2.5" />
+                  </svg>
+                  <span class="p-drop-title" id="drop-title">Pilih file di sini</span>
+                  <span class="p-drop-info" id="info">pdf, docx, maks 10MB</span>
+                </button>
+
+                <button type="submit" class="p-kirim">Unggah Tugas</button>
+              </form>
+            <?php endif; ?>
+          <?php endif; ?>
         </div>
       <?php endif; ?>
     </main>
