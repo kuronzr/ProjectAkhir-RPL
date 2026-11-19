@@ -112,7 +112,7 @@ $formattedData = array_map(function ($row) use ($statusMap) {
 
   <div class="toast" id="toast" role="status"></div>
 
-  <script src="../public/js/pengajuan-subscription.js?"></script>
+  <script src="../public/js/pengajuan-subscription.js"></script>
 </body>
 
 </html>

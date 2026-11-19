@@ -184,7 +184,7 @@ $takenIds = $userModel->getUserCourseIds($userId);
 
   </main>
 
-  <script src="../public/js/profil.js?v=6"></script>
+  <script src="../public/js/profil.js"></script>
   <script src="../public/js/notif.js"></script>
 
 </html>
