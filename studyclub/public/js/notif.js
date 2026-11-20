@@ -3,9 +3,7 @@
   const SCHEDULE_KEY = 'studyclub_schedules';
 
   const STATIS = [
-    { id: 'promo', judul: 'Promo Premium diskon 67%', teks: 'Berlangganan sekarang dan hemat biaya paket belajar.', href: 'premium.html' },
-    { id: 'materi-basdat', judul: 'Materi baru: CYBER SECURITY', teks: 'Materi dan praktikum CYBER SECURITY sudah tersedia.', href: 'kursus.html?course=cybersec&tab=materi' },
-    { id: 'selamat-datang', judul: 'Selamat datang di Study Club', teks: 'Lihat jadwal kegiatan dan mulai belajar bersama.', href: 'schedule-anggota.html' }
+    { id: 'promo', judul: 'Promo Premium diskon 67%', teks: 'Berlangganan sekarang dan hemat biaya paket belajar.', href: 'premium.php' },
   ];
 
   const btn = document.querySelector('.icon-btn[aria-label="Notifikasi"]');

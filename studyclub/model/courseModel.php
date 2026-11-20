@@ -8,6 +8,7 @@ class CourseModel
         $this->conn = $db;
     }
 
+    // Fungsi ambil semua kursus
     public function getAllCourses()
     {
         $sql = "SELECT c.*,
@@ -19,6 +20,7 @@ class CourseModel
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
+    // Fungsi ambil kursus berdasarkan ID
     public function getCourseById($id)
     {
         $stmt = $this->conn->prepare("SELECT * FROM courses WHERE id = :id LIMIT 1");
@@ -26,6 +28,7 @@ class CourseModel
         return $stmt->fetch(PDO::FETCH_ASSOC);
     }
 
+    // Fungsi ambil kursus berdasarkan nama
     public function createCourse($nama, $kategori, $tema, $deskripsi)
     {
         $sql = "INSERT INTO courses (nama_kursus, kategori, tema_banner, deskripsi) VALUES (:nama, :kat, :tema, :desk)";
@@ -38,12 +41,14 @@ class CourseModel
         ]);
     }
 
+    // Fungsi update kursus
     public function deleteCourse($id)
     {
         $stmt = $this->conn->prepare("DELETE FROM courses WHERE id = :id");
         return $stmt->execute([':id' => $id]);
     }
 
+    // Fungsi ambil materi berdasarkan kursus
     public function getMaterialsByCourse($courseId)
     {
         $stmt = $this->conn->prepare("SELECT * FROM course_materials WHERE course_id = :cid ORDER BY id ASC");
@@ -51,6 +56,7 @@ class CourseModel
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
+    // Fungsi ambil materi berdasarkan ID
     public function getMaterialById($id)
     {
         $stmt = $this->conn->prepare("SELECT * FROM course_materials WHERE id = :id LIMIT 1");
@@ -58,6 +64,7 @@ class CourseModel
         return $stmt->fetch(PDO::FETCH_ASSOC);
     }
 
+    // Fungsi buat materi baru
     public function createMaterial($courseId, $judul, $tanggal, $videoUrl, $fileModul, $deskripsi, $poinModul, $isPremium = 0)
     {
         $sql = "INSERT INTO course_materials (course_id, judul, tanggal, video_url, file_modul, deskripsi, poin_modul, is_premium)
@@ -75,6 +82,7 @@ class CourseModel
         ]);
     }
 
+    // Fungsi update materi
     public function getPracticalsByCourse($courseId)
     {
         $stmt = $this->conn->prepare("SELECT * FROM course_practicals WHERE course_id = :cid ORDER BY id ASC");
@@ -82,6 +90,7 @@ class CourseModel
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
+    // Fungsi ambil praktikum berdasarkan ID
     public function getPracticalById($id)
     {
         $stmt = $this->conn->prepare("SELECT * FROM course_practicals WHERE id = :id LIMIT 1");
@@ -89,6 +98,7 @@ class CourseModel
         return $stmt->fetch(PDO::FETCH_ASSOC);
     }
 
+    // Fungsi buat praktikum baru
     public function createPractical($courseId, $judul, $tanggal, $instruksi, $referensiLink)
     {
         $sql = "INSERT INTO course_practicals (course_id, judul, tanggal, instruksi, referensi_link)

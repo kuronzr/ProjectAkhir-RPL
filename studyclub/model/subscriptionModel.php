@@ -8,6 +8,7 @@ class SubscriptionModel
         $this->conn = $db;
     }
 
+    // Fungsi ambil status membership user
     public function getUserMembership($userId)
     {
         $stmt = $this->conn->prepare("SELECT membership_status, membership_expired FROM users WHERE id = :id LIMIT 1");
@@ -27,6 +28,7 @@ class SubscriptionModel
         return $user['membership_status'] ?? 'reguler';
     }
 
+    // Fungsi simpan data checkout
     public function submitCheckout($userId, $paket, $nama, $negara, $alamat, $metode, $total)
     {
         $sql = "INSERT INTO subscriptions (user_id, paket, nama_lengkap, negara, alamat, metode_pembayaran, total_bayar, status)
@@ -43,6 +45,7 @@ class SubscriptionModel
         ]);
     }
 
+    // Fungsi ambil semua data subscription
     public function getAllSubscriptions()
     {
         $sql = "SELECT id, user_id, nama_lengkap, paket, metode_pembayaran, total_bayar, status, DATE(created_at) AS tgl
@@ -52,6 +55,7 @@ class SubscriptionModel
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
+    // Fungsi update status subscription dan membership user
     public function updateSubscriptionStatus($subId, $aksi)
     {
         try {
@@ -87,6 +91,7 @@ class SubscriptionModel
         }
     }
 
+    // Fungsi ambil semua member dengan status subscription terakhir
     public function getAllMembersWithSubscription()
     {
         $sql = "SELECT 
@@ -108,6 +113,7 @@ class SubscriptionModel
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
+    // Fungsi update status banned member
     public function setMemberBanStatus($userId, $isBanned)
     {
         $stmt = $this->conn->prepare("UPDATE users SET is_banned = :ban WHERE id = :id");
@@ -117,6 +123,7 @@ class SubscriptionModel
         ]);
     }
 
+    // Fungsi cek apakah user dibanned
     public function isUserBanned($userId) {
         $stmt = $this->conn->prepare("SELECT is_banned FROM users WHERE id = :id LIMIT 1");
         $stmt->execute([':id' => $userId]);

@@ -6,11 +6,13 @@ class ScheduleModel {
         $this->conn = $db;
     }
 
+    // Fungsi ambil semua jadwal
     public function getAllSchedules() {
         $stmt = $this->conn->query("SELECT * FROM schedules ORDER BY tanggal ASC, waktu_mulai ASC");
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
+    // Fungsi buat jadwal baru
     public function createSchedule($nama, $kategori, $tanggal, $mulai, $selesai, $lokasi, $deskripsi) {
         $sql = "INSERT INTO schedules (nama_kegiatan, kategori, tanggal, waktu_mulai, waktu_selesai, lokasi, deskripsi)
                 VALUES (:nama, :kat, :tgl, :mulai, :selesai, :lok, :desk)";
@@ -26,6 +28,7 @@ class ScheduleModel {
         ]);
     }
 
+    // Fungsi hapus jadwal
     public function deleteSchedule($id) {
         $stmt = $this->conn->prepare("DELETE FROM schedules WHERE id = :id");
         return $stmt->execute([':id' => $id]);

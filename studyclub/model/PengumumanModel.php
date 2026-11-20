@@ -7,6 +7,7 @@ class AnnouncementModel {
         $this->conn = $db;
     }
 
+    // Fungsi ambil pengumuman
     public function getAnnouncement() {
         $query = "SELECT id, isi, updated_at FROM " . $this->table . " ORDER BY id ASC LIMIT 1";
         $stmt = $this->conn->prepare($query);
@@ -15,6 +16,7 @@ class AnnouncementModel {
         return $stmt->fetch(PDO::FETCH_ASSOC);
     }
 
+    // Fungsi simpan pengumuman
     public function saveAnnouncement($isi, $adminId) {
         $existing = $this->getAnnouncement();
 
