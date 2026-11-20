@@ -375,6 +375,17 @@ if ($courseId > 0) {
             <h1 class="m-title"><?= htmlspecialchars($detail['judul']) ?></h1>
             <div class="m-date"><?= date('d F Y', strtotime($detail['tanggal'])) ?></div>
           </div>
+
+          <?php if ($isAdmin): ?>
+            <a href="form-admin.php?course=<?= $courseId ?>&type=materi&id=<?= $detail['id'] ?>" class="a-pencil"
+              title="Edit Materi" aria-label="Edit Materi">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                stroke-linejoin="round">
+                <path d="M12 20h9" />
+                <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z" />
+              </svg>
+            </a>
+          <?php endif; ?>
         </div>
 
         <div id="isi">
@@ -496,6 +507,17 @@ if ($courseId > 0) {
             <h1 class="m-title"><?= htmlspecialchars($detail['judul']) ?></h1>
             <div class="m-date"><?= date('d F Y', strtotime($detail['tanggal'])) ?></div>
           </div>
+
+          <?php if ($isAdmin): ?>
+            <a href="form-admin.php?course=<?= $courseId ?>&type=praktikum&id=<?= $detail['id'] ?>" class="a-pencil"
+              title="Edit Praktikum" aria-label="Edit Praktikum">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                stroke-linejoin="round">
+                <path d="M12 20h9" />
+                <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z" />
+              </svg>
+            </a>
+          <?php endif; ?>
         </div>
 
         <div id="isi">
