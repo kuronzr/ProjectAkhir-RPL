@@ -90,7 +90,7 @@ if ($isPremium) {
         <h3>Keuntungan</h3>
         <ul class="perks">
           <li>Akses semua materi dan praktikum</li>
-          <li>Rekaman sesi belajar</li>
+          <li>Kelas dan materi baru gratis</li>
           <li>Latihan soal dan pembahasan</li>
           <li>Tanya jawab dengan mentor</li>
         </ul>
@@ -106,7 +106,6 @@ if ($isPremium) {
         <h3>Keuntungan</h3>
         <ul class="perks">
           <li>Semua keuntungan paket bulanan</li>
-          <li>Kelas dan materi baru gratis</li>
           <li>Sertifikat penyelesaian</li>
           <li>Prioritas dukungan mentor</li>
         </ul>
