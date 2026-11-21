@@ -68,6 +68,12 @@ if (basename($_SERVER['SCRIPT_FILENAME']) === 'prosesProfil.php') {
             $fotoPath = '';
         }
 
+        if (isset($_FILES['foto']) && $_FILES['foto']['error'] !== UPLOAD_ERR_NO_FILE && $_FILES['foto']['error'] !== UPLOAD_ERR_OK) {
+            $_SESSION['profil_err'] = 'Upload foto gagal (kode error: ' . $_FILES['foto']['error'] . '). Pastikan ukuran file tidak terlalu besar.';
+            header("Location: ../view/profil.php");
+            exit;
+        }
+
         if (isset($_FILES['foto']) && $_FILES['foto']['error'] === UPLOAD_ERR_OK) {
             $tmpName = $_FILES['foto']['tmp_name'];
             $size = $_FILES['foto']['size'];
@@ -79,8 +85,14 @@ if (basename($_SERVER['SCRIPT_FILENAME']) === 'prosesProfil.php') {
             }
 
             $info = @getimagesize($tmpName);
-            $allowedTypes = [IMAGETYPE_JPEG, IMAGETYPE_PNG, IMAGETYPE_WEBP, IMAGETYPE_GIF];
-            if (!$info || !in_array($info[2], $allowedTypes, true)) {
+            $allowedTypes = [
+                IMAGETYPE_JPEG => 'jpg',
+                IMAGETYPE_PNG => 'png',
+                IMAGETYPE_WEBP => 'webp',
+                IMAGETYPE_GIF => 'gif',
+            ];
+
+            if (!$info || !isset($allowedTypes[$info[2]])) {
                 $_SESSION['profil_err'] = 'Format foto harus JPG, PNG, WEBP, atau GIF.';
                 header("Location: ../view/profil.php");
                 exit;
@@ -91,34 +103,49 @@ if (basename($_SERVER['SCRIPT_FILENAME']) === 'prosesProfil.php') {
             }
 
             [$origW, $origH, $imgType] = $info;
-            $srcImg = match ($imgType) {
-                IMAGETYPE_JPEG => imagecreatefromjpeg($tmpName),
-                IMAGETYPE_PNG => imagecreatefrompng($tmpName),
-                IMAGETYPE_WEBP => imagecreatefromwebp($tmpName),
-                IMAGETYPE_GIF => imagecreatefromgif($tmpName),
-            };
+            $saved = false;
 
-            $cropSize = min($origW, $origH);
-            $srcX = (int) floor(($origW - $cropSize) / 2);
-            $srcY = (int) floor(($origH - $cropSize) / 2);
-            $targetSize = 320;
+            if (function_exists('imagecreatetruecolor')) {
+                $srcImg = match ($imgType) {
+                    IMAGETYPE_JPEG => function_exists('imagecreatefromjpeg') ? @imagecreatefromjpeg($tmpName) : false,
+                    IMAGETYPE_PNG => function_exists('imagecreatefrompng') ? @imagecreatefrompng($tmpName) : false,
+                    IMAGETYPE_WEBP => function_exists('imagecreatefromwebp') ? @imagecreatefromwebp($tmpName) : false,
+                    IMAGETYPE_GIF => function_exists('imagecreatefromgif') ? @imagecreatefromgif($tmpName) : false,
+                    default => false,
+                };
 
-            $dstImg = imagecreatetruecolor($targetSize, $targetSize);
-            imagecopyresampled($dstImg, $srcImg, 0, 0, $srcX, $srcY, $targetSize, $targetSize, $cropSize, $cropSize);
+                if ($srcImg) {
+                    $cropSize = min($origW, $origH);
+                    $srcX = (int) floor(($origW - $cropSize) / 2);
+                    $srcY = (int) floor(($origH - $cropSize) / 2);
+                    $targetSize = 320;
 
-            $newFileName = 'profil_' . $userId . '_' . time() . '.jpg';
-            $destPath = $uploadDir . $newFileName;
+                    $dstImg = imagecreatetruecolor($targetSize, $targetSize);
+                    $white = imagecolorallocate($dstImg, 255, 255, 255);
+                    imagefill($dstImg, 0, 0, $white);
+                    imagecopyresampled($dstImg, $srcImg, 0, 0, $srcX, $srcY, $targetSize, $targetSize, $cropSize, $cropSize);
 
-            if (!imagejpeg($dstImg, $destPath, 88)) {
-                imagedestroy($srcImg);
-                imagedestroy($dstImg);
-                $_SESSION['profil_err'] = 'Gagal menyimpan hasil crop foto ke server.';
+                    $newFileName = 'profil_' . $userId . '_' . time() . '.jpg';
+                    $destPath = $uploadDir . $newFileName;
+                    $saved = imagejpeg($dstImg, $destPath, 88);
+
+                    imagedestroy($srcImg);
+                    imagedestroy($dstImg);
+                }
+            }
+
+            if (!$saved) {
+                $ext = $allowedTypes[$imgType];
+                $newFileName = 'profil_' . $userId . '_' . time() . '.' . $ext;
+                $destPath = $uploadDir . $newFileName;
+                $saved = move_uploaded_file($tmpName, $destPath);
+            }
+
+            if (!$saved) {
+                $_SESSION['profil_err'] = 'Gagal menyimpan foto ke folder server.';
                 header("Location: ../view/profil.php");
                 exit;
             }
-
-            imagedestroy($srcImg);
-            imagedestroy($dstImg);
 
             $fotoPath = '../public/uploads/profil/' . $newFileName;
         }
@@ -152,11 +179,11 @@ if (basename($_SERVER['SCRIPT_FILENAME']) === 'prosesProfil.php') {
 
         header("Location: ../view/profil.php");
         exit;
-    } catch (PDOException $e) {
+    } catch (Throwable $e) {
         if ($db->inTransaction()) {
             $db->rollBack();
         }
-        $_SESSION['profil_err'] = 'Kesalahan database: ' . $e->getMessage();
+        $_SESSION['profil_err'] = 'Gagal memperbarui profil: ' . $e->getMessage();
         header("Location: ../view/profil.php");
         exit;
     }

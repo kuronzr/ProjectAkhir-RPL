@@ -127,7 +127,6 @@ if ($action === 'update_materi') {
     $fileModul = $old['file_modul'] ?? null;
     $videoUrl = $old['video_url'] ?? null;
 
-    // Jika upload modul PDF baru
     if (isset($_FILES['file_modul']) && $_FILES['file_modul']['error'] === UPLOAD_ERR_OK) {
         $modulDir = __DIR__ . '/../public/uploads/modul/';
         if (!is_dir($modulDir)) mkdir($modulDir, 0777, true);

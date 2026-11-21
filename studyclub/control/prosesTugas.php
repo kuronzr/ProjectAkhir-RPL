@@ -28,9 +28,6 @@ if ($courseId <= 0 || $practicalId <= 0) {
 
 $uploadDir = __DIR__ . '/../public/uploads/tugas/';
 
-// =====================================================================
-// AKSI CANCEL / BATALKAN PENGUMPULAN TUGAS
-// =====================================================================
 if ($action === 'cancel') {
     try {
         $stmtCheck = $db->prepare("SELECT id, file_tugas FROM practical_submissions WHERE practical_id = :pid AND user_id = :uid LIMIT 1");
@@ -54,9 +51,6 @@ if ($action === 'cancel') {
     exit;
 }
 
-// =====================================================================
-// AKSI UPLOAD TUGAS
-// =====================================================================
 if (!isset($_FILES['berkas']) || $_FILES['berkas']['error'] !== UPLOAD_ERR_OK) {
     $_SESSION['upload_msg'] = 'Silakan pilih file tugas terlebih dahulu.';
     header("Location: " . $redirectUrl);
