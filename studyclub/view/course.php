@@ -158,9 +158,6 @@ if ($courseId > 0) {
   </header>
 
   <?php if (!$course): ?>
-    <!-- ============================================================ -->
-    <!-- TAMPILAN UTAMA: DAFTAR KARTU COURSE                          -->
-    <!-- ============================================================ -->
     <main class="container">
       <div class="c-head-row">
         <h1 class="page-title">Course <?= $isAdmin ? '<span class="c-admin-badge">Admin</span>' : '' ?></h1>
@@ -170,7 +167,6 @@ if ($courseId > 0) {
         <?php endif; ?>
       </div>
 
-      <!-- ===== TOOLBAR ===== -->
       <div class="c-toolbar">
         <select id="urut" aria-label="Urutkan course">
           <option value="nama">Urut berdasarkan nama kursus</option>
@@ -210,7 +206,6 @@ if ($courseId > 0) {
     </main>
 
     <?php if ($isAdmin): ?>
-      <!-- ===== MODAL TAMBAH COURSE ===== -->
       <div class="modal-overlay" id="modalTambahCourse" hidden>
         <div class="modal" role="dialog" aria-modal="true" aria-labelledby="tambahCourseTitle">
           <div class="modal-head">
@@ -255,9 +250,6 @@ if ($courseId > 0) {
     <?php endif; ?>
 
   <?php elseif ($subMode === 'list'): ?>
-    <!-- ============================================================ -->
-    <!-- TAMPILAN ISI KURSUS: BANNER, TAB PRAKTIKUM & MATERI          -->
-    <!-- ============================================================ -->
     <?php
     $tema = $course['tema_banner'] ?? 'navy';
     $coverClass = str_starts_with($tema, 'p-') ? $tema : 'p-' . $tema;
@@ -277,7 +269,6 @@ if ($courseId > 0) {
         <button type="button" class="k-tab" data-tab="materi" aria-pressed="false">Materi</button>
       </div>
 
-      <!-- DAFTAR PRAKTIKUM + TOMBOL TAMBAH PRAKTIKUM -->
       <div id="wrap-praktikum">
         <ul class="k-list" id="list-praktikum">
           <?php if (empty($listPraktikum)): ?>
@@ -306,7 +297,6 @@ if ($courseId > 0) {
         <?php endif; ?>
       </div>
 
-      <!-- DAFTAR MATERI + TOMBOL TAMBAH MATERI -->
       <div id="wrap-materi" hidden>
         <ul class="k-list" id="list-materi">
           <?php if (empty($listMateri)): ?>
@@ -360,9 +350,6 @@ if ($courseId > 0) {
     </main>
 
   <?php elseif ($subMode === 'materi'): ?>
-    <!-- ============================================================ -->
-    <!-- TAMPILAN DETAIL MATERI (IKLAN REGULER & DOWNLOAD PREMIUM)     -->
-    <!-- ============================================================ -->
     <main class="container m-page">
       <a class="m-back" href="course.php?id=<?= $courseId ?>">&larr; Kembali</a>
 
@@ -417,25 +404,25 @@ if ($courseId > 0) {
             </div>
           <?php endif; ?>
 
-          <?php if (!empty($detail['file_modul'])): ?>
+          <?php if (!empty($detail['video_url'])): ?>
             <div class="m-center">
               <?php if ($isAdmin || $isPremium): ?>
-                <a class="m-unduh" href="../control/download.php?materi=<?= $detail['id'] ?>">
+                <a class="m-unduh" href="../control/prosesDownload.php?type=video&materi=<?= $detail['id'] ?>">
                   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
                     stroke-linejoin="round">
                     <path d="M12 3v12" />
                     <path d="M7 11l5 5 5-5" />
                     <path d="M5 21h14" />
                   </svg>
-                  Unduh
+                  Unduh Video
                 </a>
               <?php else: ?>
-                <a class="m-unduh locked" href="premium.php" title="Upgrade ke Premium untuk mengunduh modul">
+                <a class="m-unduh locked" href="premium.php" title="Upgrade ke Premium untuk mengunduh video">
                   <svg viewBox="0 0 24 24" fill="currentColor">
                     <path
                       d="M12 2a5 5 0 0 0-5 5v3H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8a2 2 0 0 0-2-2h-1V7a5 5 0 0 0-5-5zm-3 5a3 3 0 0 1 6 0v3H9V7zm3 7a1.5 1.5 0 0 1 .75 2.8V18h-1.5v-1.2A1.5 1.5 0 0 1 12 14z" />
                   </svg>
-                  Unduh (Premium)
+                  Unduh Video (Premium)
                 </a>
               <?php endif; ?>
             </div>
@@ -462,7 +449,7 @@ if ($courseId > 0) {
                 </span>
 
                 <?php if ($isAdmin || $isPremium): ?>
-                  <a class="m-unduh" href="../control/download.php?materi=<?= $detail['id'] ?>">
+                  <a class="m-unduh" href="../control/prosesDownload.php?materi=<?= $detail['id'] ?>">
                     Unduh File Modul
                   </a>
                 <?php else: ?>
@@ -492,9 +479,6 @@ if ($courseId > 0) {
     </main>
 
   <?php elseif ($subMode === 'praktikum'): ?>
-    <!-- ============================================================ -->
-    <!-- TAMPILAN DETAIL PRAKTIKUM                                    -->
-    <!-- ============================================================ -->
     <main class="container m-page">
       <a class="m-back" href="course.php?id=<?= $courseId ?>">&larr; Kembali</a>
 
@@ -526,7 +510,7 @@ if ($courseId > 0) {
           </section>
 
           <section class="p-box">
-            <h2 class="p-sub">Referensi dan Link GitHub</h2>
+            <h2 class="p-sub">Referensi</h2>
             <ul class="m-modul">
               <?php
               $links = array_filter(explode("\n", $detail['referensi_link'] ?? ''));
@@ -602,7 +586,7 @@ if ($courseId > 0) {
                     </p>
                   </div>
 
-                  <form action="../control/submit_praktikum.php" method="POST"
+                  <form action="../control/prosesTugas.php" method="POST"
                     onsubmit="return confirm('Batalkan dan hapus tugas yang sudah diunggah?');">
                     <input type="hidden" name="action" value="cancel">
                     <input type="hidden" name="course_id" value="<?= $courseId ?>">
@@ -623,11 +607,11 @@ if ($courseId > 0) {
                 <?php if ($extTugas === 'pdf'): ?>
                   <iframe class="m-pdf-frame mt-12" src="<?= $fileUrl ?>"></iframe>
                 <?php else: ?>
-                  <p class="p-docx-note">File DOCX tersimpan. Klik <strong>Buka / Unduh</strong> untuk memeriksa dokumen.</p>
+                  <p class="p-docx-note">File tersimpan. Klik <strong>Buka / Unduh</strong> untuk memeriksa dokumen.</p>
                 <?php endif; ?>
               </section>
             <?php else: ?>
-              <form action="../control/submit_praktikum.php" method="POST" enctype="multipart/form-data">
+              <form action="../control/prosesTugas.php" method="POST" enctype="multipart/form-data">
                 <input type="hidden" name="action" value="upload">
                 <input type="hidden" name="course_id" value="<?= $courseId ?>">
                 <input type="hidden" name="practical_id" value="<?= $detail['id'] ?>">

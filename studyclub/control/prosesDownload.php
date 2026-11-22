@@ -29,6 +29,8 @@ if (!$isAdmin && !$isPremium) {
 }
 
 $materiId = (int) ($_GET['materi'] ?? 0);
+$type = $_GET['type'] ?? 'modul';
+
 if ($materiId <= 0) {
     header("Location: ../view/course.php");
     exit;
@@ -37,17 +39,30 @@ if ($materiId <= 0) {
 $courseModel = new CourseModel($db);
 $materi = $courseModel->getMaterialById($materiId);
 
-if (!$materi || empty($materi['file_modul'])) {
+if (!$materi) {
     header("Location: ../view/course.php");
     exit;
 }
 
-$filename = basename($materi['file_modul']);
-$filePath = "../public/uploads/modul/" . $filename;
+if ($type === 'video') {
+    if (empty($materi['video_url'])) {
+        header("Location: ../view/course.php");
+        exit;
+    }
+    $filename = basename($materi['video_url']);
+    $filePath = "../public/uploads/video/" . $filename;
+} else {
+    if (empty($materi['file_modul'])) {
+        header("Location: ../view/course.php");
+        exit;
+    }
+    $filename = basename($materi['file_modul']);
+    $filePath = "../public/uploads/modul/" . $filename;
+}
 
 if (!file_exists($filePath)) {
     http_response_code(404);
-    echo "File modul tidak ditemukan di server.";
+    echo "File tidak ditemukan di server.";
     exit;
 }
 

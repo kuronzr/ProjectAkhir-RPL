@@ -152,7 +152,7 @@ $isiPengumuman = $pengumuman ? $pengumuman['isi'] : 'Belum ada pengumuman saat i
 
         <div class="slides">
           <div class="slide active">
-            <div class="panel"><small>PROMO PREMIUM</small><strong>67%</strong><span>DISKON PAKET BELAJAR</span></div>
+            <div class="panel"><small>PROMO PREMIUM</small><strong>16%</strong><span>DISKON PAKET TAHUNAN</span></div>
             <div class="art"><img src="../public/img/logo.png" alt=""></div>
           </div>
           <div class="slide alt">
